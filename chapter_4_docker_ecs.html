@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 4. Docker & ECS 실전</title>
+  <style>
+*{box-sizing:border-box}body{margin:0;font-family:'Noto Sans KR',sans-serif;background:#f1f5f9;color:#1e293b;line-height:1.75}header{background:linear-gradient(135deg,#1e3a5f,#0ea5e9);padding:38px 20px;color:white}header .wrap,main{max-width:1050px;margin:auto}header h1{margin:0;font-size:32px;color:white}header p{margin:8px 0 0;color:#e0f2fe}nav{background:#0f172a;padding:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:10}nav a{color:#cbd5e1;text-decoration:none;padding:9px 13px;border-radius:10px;font-weight:700;font-size:14px}nav a:hover,.active{background:#0ea5e9;color:white}main{padding:30px 18px}.box{background:white;border-radius:18px;padding:26px;margin-bottom:22px;box-shadow:0 4px 18px rgba(0,0,0,.08)}h2{font-size:25px;color:#0f172a;border-bottom:3px solid #e2e8f0;padding-bottom:8px;margin-top:0}h3{font-size:18px;color:#1e3a5f;margin-top:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.card{background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #0ea5e9;border-radius:14px;padding:16px}.card b{display:block;color:#0f172a;margin-bottom:5px}.tip{background:#fffbeb;border-left:6px solid #f59e0b;padding:16px;border-radius:12px;margin:18px 0;color:#92400e}.warn{background:#fef2f2;border-left:6px solid #ef4444;padding:16px;border-radius:12px;margin:18px 0;color:#991b1b}pre{background:#0f172a;color:#e2e8f0;padding:16px;border-radius:12px;overflow:auto;font-size:13px;line-height:1.65}table{width:100%;border-collapse:collapse;background:white;margin:14px 0}th,td{border:1px solid #e2e8f0;padding:10px;text-align:left;vertical-align:top}th{background:#e0f2fe}.next{display:flex;justify-content:space-between;gap:10px}.btn{display:inline-block;background:#0ea5e9;color:white;text-decoration:none;border-radius:10px;padding:10px 16px;font-weight:800}.check li{margin:7px 0}.diagram{background:#f8fafc;border:1px dashed #94a3b8;border-radius:14px;padding:16px;font-family:monospace;white-space:pre;overflow:auto}
+  </style>
+</head>
+<body>
+<header><div class="wrap"><h1>Chapter 4. Docker & ECS 실전</h1><p>Dockerfile · ECR · ECS · Fargate · ALB · 장애 대응</p></div></header>
+<nav>
+<a href="index.html">홈</a><a href="chapter1-linux.html">1 Linux</a><a href="chapter2-network.html">2 Network</a><a href="chapter3-database.html">3 Database</a><a class="active" href="chapter4-docker-ecs.html">4 Docker/ECS</a><a href="chapter5-eks.html">5 EKS</a><a href="chapter6-terraform.html">6 Terraform</a><a href="chapter7-monitoring.html">7 Monitoring</a><a href="chapter8-serverless.html">8 Serverless</a>
+</nav>
+<main>
+<section class="box">
+<h2>1. 컨테이너가 중요한 이유</h2>
+<p>컨테이너는 애플리케이션과 실행 환경을 하나의 이미지로 패키징하여 어디서든 동일하게 실행할 수 있게 해준다. 기능경기에서는 Dockerfile 작성, ECR 이미지 Push, ECS/Fargate 배포, ALB 연결이 자주 출제된다.</p>
+<div class="grid">
+<div class="card"><b>Docker</b>컨테이너 이미지 빌드와 실행</div>
+<div class="card"><b>ECR</b>AWS 컨테이너 이미지 저장소</div>
+<div class="card"><b>ECS</b>AWS 관리형 컨테이너 오케스트레이션</div>
+<div class="card"><b>Fargate</b>서버 관리 없는 컨테이너 실행 방식</div>
+</div>
+<div class="tip">컨테이너 배포 문제는 이미지, 포트, IAM Role, Security Group, Health Check를 순서대로 확인하면 대부분 해결할 수 있다.</div>
+</section>
+
+<section class="box">
+<h2>2. VM과 컨테이너 비교</h2>
+<table>
+<tr><th>구분</th><th>VM</th><th>컨테이너</th></tr>
+<tr><td>가상화 수준</td><td>하드웨어 수준</td><td>OS 커널 공유</td></tr>
+<tr><td>구성</td><td>Guest OS + App</td><td>App + Library</td></tr>
+<tr><td>시작 속도</td><td>느림</td><td>빠름</td></tr>
+<tr><td>리소스 사용</td><td>많음</td><td>적음</td></tr>
+<tr><td>AWS 예시</td><td>EC2</td><td>ECS, EKS, Fargate</td></tr>
+</table>
+<div class="tip">실무에서는 EC2 위에서 Docker를 실행하거나, ECS/EKS/Fargate를 사용해 컨테이너를 운영한다.</div>
+</section>
+
+<section class="box">
+<h2>3. Docker 기본 명령어</h2>
+<pre># 이미지 목록
+docker images
+
+# 컨테이너 실행 목록
+docker ps
+
+# 종료된 컨테이너 포함 전체 목록
+docker ps -a
+
+# 컨테이너 로그
+docker logs CONTAINER_ID
+
+# 컨테이너 내부 접속
+docker exec -it CONTAINER_ID sh
+
+# 컨테이너 리소스 확인
+docker stats</pre>
+<h3>자주 발생하는 오류</h3>
+<table>
+<tr><th>오류</th><th>원인</th><th>해결</th></tr>
+<tr><td>Cannot connect to Docker daemon</td><td>Docker daemon 중지</td><td>systemctl restart docker</td></tr>
+<tr><td>bind address already in use</td><td>포트 충돌</td><td>ss -tlnp로 점유 프로세스 확인</td></tr>
+<tr><td>No space left on device</td><td>디스크 부족</td><td>docker system prune -a</td></tr>
+</table>
+</section>
+
+<section class="box">
+<h2>4. Dockerfile 작성</h2>
+<p>Dockerfile은 이미지를 만드는 설계도이다. 기능경기에서는 간단한 웹 애플리케이션 또는 API 서버를 Dockerfile로 이미지화하는 문제가 자주 나온다.</p>
+<pre>FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8080
+CMD ["python", "app.py"]</pre>
+<table>
+<tr><th>명령어</th><th>의미</th></tr>
+<tr><td>FROM</td><td>베이스 이미지 지정</td></tr>
+<tr><td>WORKDIR</td><td>작업 디렉토리 지정</td></tr>
+<tr><td>COPY</td><td>파일 복사</td></tr>
+<tr><td>RUN</td><td>이미지 빌드 중 명령 실행</td></tr>
+<tr><td>EXPOSE</td><td>컨테이너가 사용하는 포트 문서화</td></tr>
+<tr><td>CMD</td><td>컨테이너 시작 시 실행 명령</td></tr>
+</table>
+<div class="warn">EXPOSE는 실제 포트 공개가 아니다. Docker 실행 시 -p 옵션이나 ECS Task Definition의 portMappings가 필요하다.</div>
+</section>
+
+<section class="box">
+<h2>5. Dockerfile Best Practice</h2>
+<div class="grid">
+<div class="card"><b>latest 태그 지양</b>node:latest보다 node:20-alpine처럼 명확한 버전 사용</div>
+<div class="card"><b>경량 이미지 사용</b>slim, alpine, distroless 활용</div>
+<div class="card"><b>캐시 활용</b>requirements.txt 또는 package.json을 먼저 복사</div>
+<div class="card"><b>비root 실행</b>USER appuser로 권한 최소화</div>
+</div>
+<h3>Node.js 예시</h3>
+<pre>FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+EXPOSE 3000
+CMD ["node", "server.js"]</pre>
+<h3>Multi-stage Build 예시</h3>
+<pre>FROM golang:1.22-alpine AS builder
+WORKDIR /src
+COPY . .
+RUN go build -o server
+
+FROM alpine:3.19
+COPY --from=builder /src/server /server
+CMD ["/server"]</pre>
+<div class="tip">Multi-stage Build를 사용하면 빌드 도구가 최종 이미지에 포함되지 않아 이미지 크기와 공격 표면을 줄일 수 있다.</div>
+</section>
+
+<section class="box">
+<h2>6. ECR 이미지 Push 흐름</h2>
+<p>ECR은 AWS에서 제공하는 컨테이너 이미지 저장소이다. ECS나 EKS에서 이미지를 실행하려면 먼저 ECR에 이미지를 Push해야 한다.</p>
+<div class="diagram">Dockerfile
+  ↓ docker build
+Local Image
+  ↓ docker tag
+ECR Repository
+  ↓ ECS/EKS Pull
+Running Container</div>
+<pre># ECR 로그인
+aws ecr get-login-password --region ap-northeast-2 | \
+  docker login --username AWS \
+  --password-stdin ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com
+
+# 이미지 빌드
+docker build -t myapp:latest .
+
+# 태그 지정
+docker tag myapp:latest \
+  ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com/myapp:latest
+
+# Push
+docker push ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com/myapp:latest</pre>
+<div class="warn">no basic auth credentials 오류는 ECR 로그인을 하지 않았거나 region/account/repository 주소가 틀린 경우가 많다.</div>
+</section>
+
+<section class="box">
+<h2>7. ECS 핵심 구성</h2>
+<p>ECS는 AWS의 컨테이너 오케스트레이션 서비스이다. 컨테이너를 Task로 실행하고 Service가 원하는 개수를 유지한다.</p>
+<div class="grid">
+<div class="card"><b>Cluster</b>ECS 작업이 실행되는 논리적 공간</div>
+<div class="card"><b>Task Definition</b>컨테이너 실행 설정</div>
+<div class="card"><b>Task</b>실제로 실행 중인 컨테이너 단위</div>
+<div class="card"><b>Service</b>Task 개수 유지와 ALB 연결</div>
+</div>
+<div class="diagram">ALB
+  ↓
+Target Group
+  ↓
+ECS Service
+  ↓
+ECS Task
+  ↓
+Container</div>
+</section>
+
+<section class="box">
+<h2>8. ECS Task Definition</h2>
+<p>Task Definition에는 이미지, CPU, 메모리, 포트, 환경변수, 로그 설정이 포함된다.</p>
+<pre>{
+  "family": "skills-app",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com/myapp:latest",
+      "portMappings": [
+        { "containerPort": 8080, "protocol": "tcp" }
+      ],
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/skills-app",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}</pre>
+<div class="tip">Task Definition의 containerPort와 ALB Target Group의 port가 일치해야 한다.</div>
+</section>
+
+<section class="box">
+<h2>9. Task Role과 Execution Role</h2>
+<table>
+<tr><th>구분</th><th>역할</th><th>대표 권한</th></tr>
+<tr><td>Task Execution Role</td><td>ECS가 컨테이너 실행에 필요한 권한</td><td>ECR Pull, CloudWatch Logs</td></tr>
+<tr><td>Task Role</td><td>애플리케이션 코드가 AWS 서비스에 접근하는 권한</td><td>S3, DynamoDB, SQS 접근</td></tr>
+</table>
+<div class="warn">CannotPullContainerError는 Task Execution Role 권한, ECR 이미지 주소, NAT/인터넷 연결 문제를 확인해야 한다.</div>
+</section>
+
+<section class="box">
+<h2>10. Fargate 네트워크 구성</h2>
+<p>Fargate는 서버 관리 없이 컨테이너를 실행할 수 있는 방식이다. awsvpc 네트워크 모드를 사용하므로 각 Task가 ENI와 Security Group을 가진다.</p>
+<table>
+<tr><th>항목</th><th>설명</th></tr>
+<tr><td>Subnet</td><td>Task가 실행될 Subnet. Private Subnet 권장</td></tr>
+<tr><td>Security Group</td><td>ALB에서 App Port로 접근 허용</td></tr>
+<tr><td>Assign Public IP</td><td>Public Subnet 직접 실행 시 필요. Private Subnet이면 NAT 필요</td></tr>
+<tr><td>NAT Gateway</td><td>Private Task가 ECR Pull, 외부 API 호출 시 필요</td></tr>
+</table>
+</section>
+
+<section class="box">
+<h2>11. ECS + ALB Health Check</h2>
+<p>ALB는 Target Group의 Health Check 결과를 기반으로 정상 Task에만 트래픽을 전달한다.</p>
+<pre>resource "aws_lb_target_group" "app" {
+  port        = 8080
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = aws_vpc.main.id
+
+  health_check {
+    path                = "/health"
+    matcher             = "200"
+    interval            = 30
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+}</pre>
+<h3>ALB Unhealthy 대표 원인</h3>
+<ul class="check"><li>Health Check Path가 실제 앱에 없음</li><li>앱은 5000번 포트인데 Target Group은 8080으로 설정</li><li>ALB SG에서 ECS SG로 접근 불가</li><li>앱이 시작되기 전에 Health Check가 실패</li><li>환경변수 누락으로 앱이 Crash</li></ul>
+</section>
+
+<section class="box">
+<h2>12. Terraform ECS 구성 핵심</h2>
+<pre>resource "aws_ecs_cluster" "main" {
+  name = "skills-cluster"
+}
+
+resource "aws_cloudwatch_log_group" "app" {
+  name              = "/ecs/skills-app"
+  retention_in_days = 7
+}
+
+resource "aws_ecs_service" "app" {
+  name            = "skills-app-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.app.arn
+  desired_count   = 2
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets         = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+    security_groups = [aws_security_group.ecs.id]
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.app.arn
+    container_name   = "app"
+    container_port   = 8080
+  }
+}</pre>
+<div class="tip">ECS Service와 Target Group을 연결할 때 container_name과 container_port가 Task Definition과 정확히 일치해야 한다.</div>
+</section>
+
+<section class="box">
+<h2>13. ECS 장애 대응 플레이북</h2>
+<h3>Task가 실행되지 않을 때</h3>
+<ul class="check"><li>Task Definition image 주소가 올바른가?</li><li>ECR에 해당 tag가 존재하는가?</li><li>Task Execution Role에 ECR/CloudWatch 권한이 있는가?</li><li>Private Subnet이면 NAT Gateway가 있는가?</li><li>CPU/Memory 값이 Fargate 조합에 맞는가?</li></ul>
+<h3>Task가 바로 종료될 때</h3>
+<ul class="check"><li>CloudWatch Logs에서 앱 에러 확인</li><li>환경변수 누락 확인</li><li>DB 접속 정보 확인</li><li>CMD/ENTRYPOINT 오류 확인</li></ul>
+<h3>ALB 접속이 안 될 때</h3>
+<ul class="check"><li>Target Group Healthy 상태 확인</li><li>ALB Listener가 Target Group으로 Forward하는가?</li><li>ALB SG 80/443 Inbound 허용 확인</li><li>ECS SG가 ALB SG에서 App Port를 허용하는가?</li></ul>
+</section>
+
+<section class="box">
+<h2>14. 기능경기 실전 체크리스트</h2>
+<ul class="check">
+<li>Dockerfile이 정상 빌드되는가?</li>
+<li>로컬에서 docker run으로 앱이 실행되는가?</li>
+<li>ECR login, tag, push가 완료되었는가?</li>
+<li>Task Definition의 이미지 주소가 최신인가?</li>
+<li>Execution Role과 Task Role을 구분했는가?</li>
+<li>CloudWatch Log Group이 설정되어 있는가?</li>
+<li>ALB Target Group Health Check가 통과하는가?</li>
+<li>Security Group이 ALB → ECS 방향으로 연결되어 있는가?</li>
+</ul>
+</section>
+
+<section class="box">
+<h2>15. 출제 예상 포인트</h2>
+<div class="grid">
+<div class="card"><b>기본</b>Dockerfile 작성, 이미지 빌드, 컨테이너 실행</div>
+<div class="card"><b>중급</b>ECR Push, ECS Fargate Service, ALB 연결</div>
+<div class="card"><b>고급</b>Auto Scaling, Service Discovery, Sidecar, 배포 장애 복구</div>
+</div>
+<div class="tip">ECS 문제는 “Task가 Running인지”보다 “ALB를 통해 정상 응답하는지”가 최종 검증 기준이다.</div>
+</section>
+
+<div class="next"><a class="btn" href="chapter3-database.html">← Chapter 3</a><a class="btn" href="chapter5-eks.html">다음: Chapter 5 →</a></div>
+</main>
+</body>
+</html>

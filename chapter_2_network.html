@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 2. AWS 네트워크 실전</title>
+  <style>
+*{box-sizing:border-box}body{margin:0;font-family:'Noto Sans KR',sans-serif;background:#f1f5f9;color:#1e293b;line-height:1.75}header{background:linear-gradient(135deg,#1e3a5f,#0ea5e9);padding:38px 20px;color:white}header .wrap,main{max-width:1050px;margin:auto}header h1{margin:0;font-size:32px;color:white}header p{margin:8px 0 0;color:#e0f2fe}nav{background:#0f172a;padding:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:10}nav a{color:#cbd5e1;text-decoration:none;padding:9px 13px;border-radius:10px;font-weight:700;font-size:14px}nav a:hover,.active{background:#0ea5e9;color:white}main{padding:30px 18px}.box{background:white;border-radius:18px;padding:26px;margin-bottom:22px;box-shadow:0 4px 18px rgba(0,0,0,.08)}h2{font-size:25px;color:#0f172a;border-bottom:3px solid #e2e8f0;padding-bottom:8px;margin-top:0}h3{font-size:18px;color:#1e3a5f;margin-top:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.card{background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #0ea5e9;border-radius:14px;padding:16px}.card b{display:block;color:#0f172a;margin-bottom:5px}.tip{background:#fffbeb;border-left:6px solid #f59e0b;padding:16px;border-radius:12px;margin:18px 0;color:#92400e}.warn{background:#fef2f2;border-left:6px solid #ef4444;padding:16px;border-radius:12px;margin:18px 0;color:#991b1b}pre{background:#0f172a;color:#e2e8f0;padding:16px;border-radius:12px;overflow:auto;font-size:13px;line-height:1.65}table{width:100%;border-collapse:collapse;background:white;margin:14px 0}th,td{border:1px solid #e2e8f0;padding:10px;text-align:left;vertical-align:top}th{background:#e0f2fe}.next{display:flex;justify-content:space-between;gap:10px}.btn{display:inline-block;background:#0ea5e9;color:white;text-decoration:none;border-radius:10px;padding:10px 16px;font-weight:800}.check li{margin:7px 0}.diagram{background:#f8fafc;border:1px dashed #94a3b8;border-radius:14px;padding:16px;font-family:monospace;white-space:pre;overflow:auto}
+  </style>
+</head>
+<body>
+<header><div class="wrap"><h1>Chapter 2. AWS 네트워크 실전</h1><p>VPC · Routing · DNS · Load Balancer · EKS Networking</p></div></header>
+<nav>
+<a href="index.html">홈</a><a href="chapter1-linux.html">1 Linux</a><a class="active" href="chapter2-network.html">2 Network</a><a href="chapter3-database.html">3 Database</a><a href="chapter4-docker-ecs.html">4 Docker/ECS</a><a href="chapter5-eks.html">5 EKS</a><a href="chapter6-terraform.html">6 Terraform</a><a href="chapter7-monitoring.html">7 Monitoring</a><a href="chapter8-serverless.html">8 Serverless</a>
+</nav>
+<main>
+<section class="box">
+<h2>1. AWS 네트워크가 중요한 이유</h2>
+<p>기능경기대회 클라우드컴퓨팅 문제에서 네트워크는 거의 모든 서비스의 기반이다. VPC, Subnet, Route Table, Security Group, ALB 설정이 잘못되면 EC2, ECS, EKS, RDS가 모두 정상 동작하지 않는다.</p>
+<div class="grid">
+<div class="card"><b>VPC</b>AWS 안에 만드는 독립 사설 네트워크</div>
+<div class="card"><b>Subnet</b>AZ 단위로 나누는 네트워크 영역</div>
+<div class="card"><b>Route Table</b>트래픽이 어디로 갈지 결정하는 경로표</div>
+<div class="card"><b>Security Group</b>인스턴스/서비스 단위 상태 저장 방화벽</div>
+</div>
+<div class="tip">실전에서는 “리소스는 만들어졌는데 접속이 안 됨” 문제가 가장 많다. 대부분 Route Table, SG, Subnet Association, Health Check 문제이다.</div>
+</section>
+
+<section class="box">
+<h2>2. VPC 기본 설계</h2>
+<p>기능경기 실전에서는 일반적으로 하나의 VPC 안에 Public Subnet과 Private Subnet을 분리하여 구성한다.</p>
+<div class="diagram">VPC 10.0.0.0/16
+├─ Public Subnet A   10.0.1.0/24   → ALB, Bastion, NAT Gateway
+├─ Public Subnet B   10.0.2.0/24   → ALB, NAT Gateway
+├─ Private App A     10.0.11.0/24  → ECS/EKS Application
+├─ Private App B     10.0.12.0/24  → ECS/EKS Application
+├─ Private DB A      10.0.21.0/24  → RDS
+└─ Private DB B      10.0.22.0/24  → RDS</div>
+<table><tr><th>구분</th><th>배치 리소스</th><th>라우팅</th></tr><tr><td>Public Subnet</td><td>ALB, Bastion, NAT Gateway</td><td>0.0.0.0/0 → Internet Gateway</td></tr><tr><td>Private App Subnet</td><td>ECS, EKS Worker Node, 내부 API</td><td>0.0.0.0/0 → NAT Gateway</td></tr><tr><td>Private DB Subnet</td><td>RDS, Aurora</td><td>인터넷 직접 연결 없음</td></tr></table>
+<div class="warn">RDS를 Public Subnet에 배치하거나 DB Security Group을 0.0.0.0/0으로 열면 보안 설계 감점 요소가 될 수 있다.</div>
+</section>
+
+<section class="box">
+<h2>3. CIDR와 Subnet 크기</h2>
+<p>CIDR는 네트워크 주소 범위를 표현하는 방식이다. 기능경기에서는 계산을 복잡하게 하기보다 안정적인 범위를 사용하는 것이 좋다.</p>
+<table><tr><th>예시</th><th>의미</th><th>실전 사용</th></tr><tr><td>10.0.0.0/16</td><td>큰 VPC 범위</td><td>VPC 전체</td></tr><tr><td>10.0.1.0/24</td><td>256개 IP 범위</td><td>일반 Subnet</td></tr><tr><td>/28</td><td>작은 범위</td><td>EKS에는 비추천</td></tr></table>
+<p>AWS는 각 Subnet마다 5개의 IP를 예약한다. 따라서 /24 Subnet은 256개 중 실제 사용 가능 IP가 251개이다.</p>
+<div class="tip">EKS는 Pod마다 IP를 사용하므로 Subnet을 너무 작게 만들면 Pod 생성 실패가 발생한다. 실전에서는 /24 이상을 권장한다.</div>
+</section>
+
+<section class="box">
+<h2>4. Route Table, IGW, NAT Gateway</h2>
+<h3>Public Route</h3>
+<pre>Destination     Target
+10.0.0.0/16     local
+0.0.0.0/0       Internet Gateway</pre>
+<h3>Private Route</h3>
+<pre>Destination     Target
+10.0.0.0/16     local
+0.0.0.0/0       NAT Gateway</pre>
+<h3>Terraform 예시</h3>
+<pre>resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+}
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+}
+
+resource "aws_route" "public_internet" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main.id
+}</pre>
+<div class="warn">Route Table을 만들고 Subnet Association을 하지 않으면 해당 Subnet은 의도한 Route Table을 사용하지 않는다.</div>
+</section>
+
+<section class="box">
+<h2>5. Security Group과 NACL</h2>
+<table><tr><th>구분</th><th>Security Group</th><th>NACL</th></tr><tr><td>적용 위치</td><td>ENI/인스턴스/서비스</td><td>Subnet</td></tr><tr><td>상태</td><td>Stateful</td><td>Stateless</td></tr><tr><td>규칙</td><td>허용 규칙만</td><td>허용/거부 규칙 가능</td></tr><tr><td>실전 사용</td><td>가장 자주 사용</td><td>고급 보안 요구 시 사용</td></tr></table>
+<h3>권장 Security Group 설계</h3>
+<div class="diagram">Internet
+  ↓ 80/443
+ALB Security Group
+  ↓ 8080
+App Security Group
+  ↓ 3306
+DB Security Group</div>
+<pre># DB SG 예시: App SG에서만 MySQL 접근 허용
+ingress {
+  from_port       = 3306
+  to_port         = 3306
+  protocol        = "tcp"
+  security_groups = [aws_security_group.app.id]
+}</pre>
+<div class="tip">기능경기에서 접속 장애의 70% 이상은 Security Group 또는 Route Table 문제로 발생한다.</div>
+</section>
+
+<section class="box">
+<h2>6. DNS와 Route 53</h2>
+<p>DNS는 도메인 이름을 IP 주소 또는 AWS 리소스 주소로 변환한다. AWS에서는 Route 53을 사용하여 ALB, CloudFront, S3 정적 웹사이트 등에 도메인을 연결할 수 있다.</p>
+<table><tr><th>레코드</th><th>용도</th></tr><tr><td>A</td><td>도메인을 IPv4 주소로 연결</td></tr><tr><td>CNAME</td><td>도메인을 다른 도메인으로 연결</td></tr><tr><td>Alias</td><td>ALB, CloudFront 등 AWS 리소스에 직접 연결</td></tr><tr><td>MX</td><td>메일 서버 지정</td></tr></table>
+<pre>resource "aws_route53_record" "app" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "app"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.main.dns_name
+    zone_id                = aws_lb.main.zone_id
+    evaluate_target_health = true
+  }
+}</pre>
+</section>
+
+<section class="box">
+<h2>7. Load Balancer 실전</h2>
+<p>로드밸런서는 외부 트래픽을 여러 대상에게 분산한다. 기능경기에서는 대부분 ALB(Application Load Balancer)가 사용된다.</p>
+<table><tr><th>구분</th><th>ALB</th><th>NLB</th></tr><tr><td>계층</td><td>Layer 7</td><td>Layer 4</td></tr><tr><td>프로토콜</td><td>HTTP/HTTPS</td><td>TCP/UDP</td></tr><tr><td>기능</td><td>Path/Host Routing</td><td>고성능 TCP 처리</td></tr><tr><td>대회 사용</td><td>매우 자주</td><td>고급 문제</td></tr></table>
+<h3>ALB 구조</h3>
+<div class="diagram">Client
+  ↓
+Application Load Balancer
+  ↓
+Listener : 80/443
+  ↓
+Target Group : /health
+  ↓
+EC2 / ECS Task / EKS Pod</div>
+<h3>Target Group Health Check</h3>
+<pre>resource "aws_lb_target_group" "app" {
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+
+  health_check {
+    path                = "/health"
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+}</pre>
+<div class="warn">ALB 502 또는 unhealthy 상태는 포트 불일치, health check path 오류, SG 미허용, 앱 실행 실패가 대표 원인이다.</div>
+</section>
+
+<section class="box">
+<h2>8. EKS 네트워크 핵심</h2>
+<p>EKS는 AWS VPC CNI를 사용한다. Pod가 VPC의 IP를 직접 할당받기 때문에 Subnet IP 여유가 매우 중요하다.</p>
+<div class="grid">
+<div class="card"><b>Pod IP</b>VPC Subnet에서 IP를 할당받음</div>
+<div class="card"><b>Node ENI</b>Worker Node의 ENI에 Pod IP가 연결됨</div>
+<div class="card"><b>IP 부족</b>Pod Pending 또는 IP 할당 실패 발생</div>
+</div>
+<pre>kubectl describe pod POD_NAME
+kubectl get nodes
+kubectl get pods -A</pre>
+<div class="tip">EKS에서 Pod가 Pending인데 CPU/Memory 문제가 아니라면 Subnet IP 부족 또는 CNI 문제를 의심해야 한다.</div>
+</section>
+
+<section class="box">
+<h2>9. VPC Peering과 Client VPN</h2>
+<p>VPC Peering은 서로 다른 VPC를 연결하는 기능이고, Client VPN은 외부 사용자가 Private VPC에 안전하게 접속하기 위한 기능이다.</p>
+<div class="grid">
+<div class="card"><b>VPC Peering</b>Hub VPC와 App VPC 연결. 양쪽 Route Table 설정 필수</div>
+<div class="card"><b>Transit Gateway</b>여러 VPC를 중앙에서 연결하는 고급 네트워크 허브</div>
+<div class="card"><b>Client VPN</b>사용자 PC에서 Private Subnet 접속. 인증서와 Authorization Rule 필요</div>
+</div>
+<div class="warn">Peering 연결만 만들고 Route Table에 상대 VPC CIDR을 추가하지 않으면 통신되지 않는다.</div>
+</section>
+
+<section class="box">
+<h2>10. 기능경기 실전 장애 대응 체크리스트</h2>
+<h3>인터넷 접속이 안 될 때</h3>
+<ul class="check"><li>Public IP가 있는가?</li><li>IGW가 VPC에 연결되어 있는가?</li><li>Route Table에 0.0.0.0/0 → IGW가 있는가?</li><li>Subnet Association이 되어 있는가?</li><li>Security Group inbound가 열려 있는가?</li></ul>
+<h3>Private Subnet에서 외부로 나가지 못할 때</h3>
+<ul class="check"><li>NAT Gateway가 Public Subnet에 있는가?</li><li>NAT Gateway에 Elastic IP가 연결되어 있는가?</li><li>Private Route Table에 0.0.0.0/0 → NAT Gateway가 있는가?</li></ul>
+<h3>ALB가 unhealthy일 때</h3>
+<ul class="check"><li>Target port와 앱 port가 일치하는가?</li><li>Health check path가 실제 존재하는가?</li><li>ALB SG에서 App SG로 접근 가능한가?</li><li>앱 컨테이너/Pod가 정상 실행 중인가?</li></ul>
+</section>
+
+<section class="box">
+<h2>11. 출제 예상 포인트</h2>
+<div class="grid">
+<div class="card"><b>기본</b>VPC, Subnet, IGW, Route Table, SG 생성</div>
+<div class="card"><b>중급</b>NAT Gateway, ALB, Target Group, Route 53 Alias</div>
+<div class="card"><b>고급</b>VPC Peering, Client VPN, EKS CNI, Private Endpoint</div>
+</div>
+<div class="tip">네트워크 문제는 구축보다 검증이 중요하다. 생성 후 반드시 실제 통신 테스트를 수행한다.</div>
+</section>
+
+<div class="next"><a class="btn" href="chapter1-linux.html">← Chapter 1</a><a class="btn" href="chapter3-database.html">다음: Chapter 3 →</a></div>
+</main>
+</body>
+</html>

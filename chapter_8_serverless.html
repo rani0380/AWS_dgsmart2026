@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 8. Serverless & Event-Driven Architecture</title>
+  <style>
+*{box-sizing:border-box}body{margin:0;font-family:'Noto Sans KR',sans-serif;background:#f1f5f9;color:#1e293b;line-height:1.75}header{background:linear-gradient(135deg,#1e3a5f,#0ea5e9);padding:38px 20px;color:white}header .wrap,main{max-width:1050px;margin:auto}header h1{margin:0;font-size:32px;color:white}header p{margin:8px 0 0;color:#e0f2fe}nav{background:#0f172a;padding:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:10}nav a{color:#cbd5e1;text-decoration:none;padding:9px 13px;border-radius:10px;font-weight:700;font-size:14px}nav a:hover,.active{background:#0ea5e9;color:white}main{padding:30px 18px}.box{background:white;border-radius:18px;padding:26px;margin-bottom:22px;box-shadow:0 4px 18px rgba(0,0,0,.08)}h2{font-size:25px;color:#0f172a;border-bottom:3px solid #e2e8f0;padding-bottom:8px;margin-top:0}h3{font-size:18px;color:#1e3a5f;margin-top:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.card{background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #0ea5e9;border-radius:14px;padding:16px}.card b{display:block;color:#0f172a;margin-bottom:5px}.tip{background:#fffbeb;border-left:6px solid #f59e0b;padding:16px;border-radius:12px;margin:18px 0;color:#92400e}.warn{background:#fef2f2;border-left:6px solid #ef4444;padding:16px;border-radius:12px;margin:18px 0;color:#991b1b}pre{background:#0f172a;color:#e2e8f0;padding:16px;border-radius:12px;overflow:auto;font-size:13px;line-height:1.65}table{width:100%;border-collapse:collapse;background:white;margin:14px 0}th,td{border:1px solid #e2e8f0;padding:10px;text-align:left;vertical-align:top}th{background:#e0f2fe}.next{display:flex;justify-content:space-between;gap:10px}.btn{display:inline-block;background:#0ea5e9;color:white;text-decoration:none;border-radius:10px;padding:10px 16px;font-weight:800}.check li{margin:7px 0}.diagram{background:#f8fafc;border:1px dashed #94a3b8;border-radius:14px;padding:16px;font-family:monospace;white-space:pre;overflow:auto}
+  </style>
+</head>
+<body>
+<header><div class="wrap"><h1>Chapter 8. Serverless & Event-Driven Architecture</h1><p>Lambda · API Gateway · SQS · SNS · EventBridge · DynamoDB</p></div></header>
+<nav>
+<a href="index.html">홈</a><a href="chapter1-linux.html">1 Linux</a><a href="chapter2-network.html">2 Network</a><a href="chapter3-database.html">3 Database</a><a href="chapter4-docker-ecs.html">4 Docker/ECS</a><a href="chapter5-eks.html">5 EKS</a><a href="chapter6-terraform.html">6 Terraform</a><a href="chapter7-monitoring.html">7 Monitoring</a><a class="active" href="chapter8-serverless.html">8 Serverless</a>
+</nav>
+<main>
+<section class="box"><h2>1. 서버리스 개요</h2><p>서버리스는 서버를 직접 관리하지 않고 이벤트 기반으로 코드를 실행하는 아키텍처이다. 기능경기 자동화 과제에서 Lambda, API Gateway, SQS, SNS, EventBridge 조합이 자주 사용된다.</p><div class="grid"><div class="card"><b>Lambda</b>코드 실행</div><div class="card"><b>API Gateway</b>HTTP API 진입점</div><div class="card"><b>SQS</b>비동기 메시지 큐</div><div class="card"><b>SNS</b>알림/팬아웃</div></div></section>
+<section class="box"><h2>2. 대표 아키텍처</h2><div class="diagram">Client
+  ↓
+API Gateway
+  ↓
+Lambda
+  ↓
+DynamoDB
+
+App
+  ↓
+SQS
+  ↓
+Lambda Worker
+  ↓
+SNS Notification
+
+EventBridge Schedule
+  ↓
+Lambda</div></section>
+<section class="box"><h2>3. Lambda</h2><pre>def lambda_handler(event, context):
+    return {
+        'statusCode': 200,
+        'body': 'Hello Skills'
+    }</pre><table><tr><th>항목</th><th>설명</th></tr><tr><td>Timeout</td><td>최대 실행 시간</td></tr><tr><td>Memory</td><td>CPU 성능에도 영향</td></tr><tr><td>Environment Variables</td><td>설정값 저장</td></tr><tr><td>IAM Role</td><td>AWS 서비스 접근 권한</td></tr></table></section>
+<section class="box"><h2>4. API Gateway</h2><p>외부 HTTP 요청을 Lambda로 전달한다.</p><pre>Client → API Gateway → Lambda → DynamoDB</pre><div class="warn">502 오류는 Lambda 응답 형식 오류 또는 내부 예외일 수 있다.</div></section>
+<section class="box"><h2>5. SQS</h2><table><tr><th>개념</th><th>설명</th></tr><tr><td>Standard Queue</td><td>고성능, 중복 가능성 있음</td></tr><tr><td>FIFO Queue</td><td>순서 보장</td></tr><tr><td>DLQ</td><td>실패 메시지 보관</td></tr></table><pre>App → SQS → Lambda Consumer</pre></section>
+<section class="box"><h2>6. SNS</h2><p>SNS는 하나의 메시지를 여러 구독자에게 전달하는 Pub/Sub 서비스이다.</p><pre>Lambda → SNS → Email / SMS / Lambda / SQS</pre></section>
+<section class="box"><h2>7. EventBridge</h2><pre>cron(0 9 * * ? *)</pre><p>정기 스케줄 실행 또는 AWS 이벤트 기반 자동 실행에 사용한다.</p></section>
+<section class="box"><h2>8. Terraform 예시</h2><pre>resource "aws_lambda_function" "main" {
+  function_name = "skills-function"
+  role          = aws_iam_role.lambda.arn
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.11"
+}</pre></section>
+<section class="box"><h2>9. 장애 대응</h2><ul class="check"><li>Lambda Timeout → timeout 증가, 외부 API 지연 확인</li><li>AccessDenied → IAM Role 확인</li><li>SQS 적체 → Lambda Trigger 확인</li><li>API 502 → Lambda 로그 확인</li><li>DynamoDB Access 오류 → IAM 정책 확인</li></ul></section>
+<section class="box"><h2>10. 기능경기 체크리스트</h2><ul class="check"><li>Lambda Role 권한 확인</li><li>API Gateway 테스트</li><li>SQS Queue 연결</li><li>CloudWatch Logs 확인</li><li>EventBridge Trigger 동작 확인</li></ul></section>
+<div class="next"><a class="btn" href="chapter7-monitoring.html">← Chapter 7</a><a class="btn" href="index.html">홈으로 →</a></div>
+</main></body></html>

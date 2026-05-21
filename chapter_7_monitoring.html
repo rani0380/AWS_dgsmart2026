@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 7. Monitoring & Observability 실전</title>
+  <style>
+*{box-sizing:border-box}body{margin:0;font-family:'Noto Sans KR',sans-serif;background:#f1f5f9;color:#1e293b;line-height:1.75}header{background:linear-gradient(135deg,#1e3a5f,#0ea5e9);padding:38px 20px;color:white}header .wrap,main{max-width:1050px;margin:auto}header h1{margin:0;font-size:32px;color:white}header p{margin:8px 0 0;color:#e0f2fe}nav{background:#0f172a;padding:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:10}nav a{color:#cbd5e1;text-decoration:none;padding:9px 13px;border-radius:10px;font-weight:700;font-size:14px}nav a:hover,.active{background:#0ea5e9;color:white}main{padding:30px 18px}.box{background:white;border-radius:18px;padding:26px;margin-bottom:22px;box-shadow:0 4px 18px rgba(0,0,0,.08)}h2{font-size:25px;color:#0f172a;border-bottom:3px solid #e2e8f0;padding-bottom:8px;margin-top:0}h3{font-size:18px;color:#1e3a5f;margin-top:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.card{background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #0ea5e9;border-radius:14px;padding:16px}.card b{display:block;color:#0f172a;margin-bottom:5px}.tip{background:#fffbeb;border-left:6px solid #f59e0b;padding:16px;border-radius:12px;margin:18px 0;color:#92400e}.warn{background:#fef2f2;border-left:6px solid #ef4444;padding:16px;border-radius:12px;margin:18px 0;color:#991b1b}pre{background:#0f172a;color:#e2e8f0;padding:16px;border-radius:12px;overflow:auto;font-size:13px;line-height:1.65}table{width:100%;border-collapse:collapse;background:white;margin:14px 0}th,td{border:1px solid #e2e8f0;padding:10px;text-align:left;vertical-align:top}th{background:#e0f2fe}.next{display:flex;justify-content:space-between;gap:10px}.btn{display:inline-block;background:#0ea5e9;color:white;text-decoration:none;border-radius:10px;padding:10px 16px;font-weight:800}.check li{margin:7px 0}
+  </style>
+</head>
+<body>
+<header><div class="wrap"><h1>Chapter 7. Monitoring & Observability 실전</h1><p>CloudWatch · Logs · Metrics · Alarm · ECS · EKS · DB 장애 분석</p></div></header>
+<nav>
+<a href="index.html">홈</a><a href="chapter1-linux.html">1 Linux</a><a href="chapter2-network.html">2 Network</a><a href="chapter3-database.html">3 Database</a><a href="chapter4-docker-ecs.html">4 Docker/ECS</a><a href="chapter5-eks.html">5 EKS</a><a href="chapter6-terraform.html">6 Terraform</a><a class="active" href="chapter7-monitoring.html">7 Monitoring</a><a href="chapter8-serverless.html">8 Serverless</a>
+</nav>
+<main>
+<section class="box"><h2>1. Observability의 3대 축</h2><div class="grid"><div class="card"><b>Logs</b>무슨 일이 발생했는가?</div><div class="card"><b>Metrics</b>얼마나 느리거나 많이 사용 중인가?</div><div class="card"><b>Traces</b>어느 구간에서 병목이 발생했는가?</div></div><div class="tip">장애 분석은 추측이 아니라 증거 기반이어야 한다. Logs → Metrics → Events → Network 순으로 확인한다.</div></section>
+<section class="box"><h2>2. CloudWatch Logs</h2><pre>aws logs describe-log-groups
+aws logs tail /ecs/skills-app --follow</pre><table><tr><th>대상</th><th>로그 위치</th></tr><tr><td>ECS</td><td>CloudWatch Logs</td></tr><tr><td>Lambda</td><td>/aws/lambda/FUNCTION_NAME</td></tr><tr><td>EKS</td><td>kubectl logs</td></tr><tr><td>EC2</td><td>journalctl, /var/log</td></tr></table></section>
+<section class="box"><h2>3. 핵심 Metrics</h2><table><tr><th>서비스</th><th>지표</th></tr><tr><td>ALB</td><td>HTTPCode_Target_5XX, TargetResponseTime, HealthyHostCount</td></tr><tr><td>ECS</td><td>CPUUtilization, MemoryUtilization</td></tr><tr><td>EKS</td><td>Pod Restart, Node Resource</td></tr><tr><td>RDS</td><td>DatabaseConnections, FreeStorageSpace</td></tr><tr><td>DynamoDB</td><td>ThrottledRequests, SuccessfulRequestLatency</td></tr></table></section>
+<section class="box"><h2>4. Alarm 설정</h2><pre>resource "aws_cloudwatch_metric_alarm" "high_cpu" {
+  alarm_name          = "ecs-high-cpu"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+}</pre></section>
+<section class="box"><h2>5. 장애 대응 플레이북</h2><ul class="check"><li>ALB 502 → Target Health, App Logs, Port 확인</li><li>ECS Crash → CloudWatch Logs 확인</li><li>EKS CrashLoopBackOff → kubectl logs/describe</li><li>DB Slow → Connections, Slow Query, CPU</li><li>DynamoDB Throttle → Partition Key 설계 확인</li></ul></section>
+<section class="box"><h2>6. 기능경기 체크리스트</h2><ul class="check"><li>CloudWatch Logs 활성화</li><li>ALB Health 상태 확인</li><li>ECS/EKS 로그 확인</li><li>DB Connection 확인</li><li>Alarm 구성 여부 확인</li></ul></section>
+<div class="next"><a class="btn" href="chapter6-terraform.html">← Chapter 6</a><a class="btn" href="chapter8-serverless.html">다음: Chapter 8 →</a></div>
+</main></body></html>

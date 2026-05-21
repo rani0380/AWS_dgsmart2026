@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 3. 데이터베이스 실전</title>
+  <style>
+*{box-sizing:border-box}body{margin:0;font-family:'Noto Sans KR',sans-serif;background:#f1f5f9;color:#1e293b;line-height:1.75}header{background:linear-gradient(135deg,#1e3a5f,#0ea5e9);padding:38px 20px;color:white}header .wrap,main{max-width:1050px;margin:auto}header h1{margin:0;font-size:32px;color:white}header p{margin:8px 0 0;color:#e0f2fe}nav{background:#0f172a;padding:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:10}nav a{color:#cbd5e1;text-decoration:none;padding:9px 13px;border-radius:10px;font-weight:700;font-size:14px}nav a:hover,.active{background:#0ea5e9;color:white}main{padding:30px 18px}.box{background:white;border-radius:18px;padding:26px;margin-bottom:22px;box-shadow:0 4px 18px rgba(0,0,0,.08)}h2{font-size:25px;color:#0f172a;border-bottom:3px solid #e2e8f0;padding-bottom:8px;margin-top:0}h3{font-size:18px;color:#1e3a5f;margin-top:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.card{background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #0ea5e9;border-radius:14px;padding:16px}.card b{display:block;color:#0f172a;margin-bottom:5px}.tip{background:#fffbeb;border-left:6px solid #f59e0b;padding:16px;border-radius:12px;margin:18px 0;color:#92400e}.warn{background:#fef2f2;border-left:6px solid #ef4444;padding:16px;border-radius:12px;margin:18px 0;color:#991b1b}pre{background:#0f172a;color:#e2e8f0;padding:16px;border-radius:12px;overflow:auto;font-size:13px;line-height:1.65}table{width:100%;border-collapse:collapse;background:white;margin:14px 0}th,td{border:1px solid #e2e8f0;padding:10px;text-align:left;vertical-align:top}th{background:#e0f2fe}.next{display:flex;justify-content:space-between;gap:10px}.btn{display:inline-block;background:#0ea5e9;color:white;text-decoration:none;border-radius:10px;padding:10px 16px;font-weight:800}.check li{margin:7px 0}.diagram{background:#f8fafc;border:1px dashed #94a3b8;border-radius:14px;padding:16px;font-family:monospace;white-space:pre;overflow:auto}
+  </style>
+</head>
+<body>
+<header><div class="wrap"><h1>Chapter 3. 데이터베이스 실전</h1><p>RDS · Aurora · DynamoDB · DAX · Transaction · 장애 대응</p></div></header>
+<nav>
+<a href="index.html">홈</a><a href="chapter1-linux.html">1 Linux</a><a href="chapter2-network.html">2 Network</a><a class="active" href="chapter3-database.html">3 Database</a><a href="chapter4-docker-ecs.html">4 Docker/ECS</a><a href="chapter5-eks.html">5 EKS</a><a href="chapter6-terraform.html">6 Terraform</a><a href="chapter7-monitoring.html">7 Monitoring</a><a href="chapter8-serverless.html">8 Serverless</a>
+</nav>
+<main>
+<section class="box">
+<h2>1. 데이터베이스가 중요한 이유</h2>
+<p>클라우드 서비스는 대부분 데이터를 저장하고 조회한다. 기능경기대회에서는 웹 애플리케이션, API 서버, 메시지 시스템, 채팅 시스템, 회원 관리 시스템 등의 과제에서 RDS, Aurora, DynamoDB가 자주 사용된다.</p>
+<div class="grid">
+<div class="card"><b>RDS</b>MySQL, PostgreSQL 등 관계형 데이터베이스를 관리형으로 제공</div>
+<div class="card"><b>Aurora</b>AWS 최적화 고성능 관계형 데이터베이스</div>
+<div class="card"><b>DynamoDB</b>서버리스 NoSQL Key-Value/Document 데이터베이스</div>
+<div class="card"><b>DAX</b>DynamoDB 읽기 성능 향상을 위한 인메모리 캐시</div>
+</div>
+<div class="tip">DB가 정상이어도 네트워크, Security Group, IAM, 애플리케이션 환경변수가 잘못되면 서비스는 실패한다.</div>
+</section>
+
+<section class="box">
+<h2>2. 관계형 DB와 NoSQL 비교</h2>
+<table>
+<tr><th>구분</th><th>관계형 DB</th><th>NoSQL</th></tr>
+<tr><td>대표 서비스</td><td>RDS, Aurora</td><td>DynamoDB</td></tr>
+<tr><td>데이터 구조</td><td>Table, Row, Column</td><td>Item, Attribute</td></tr>
+<tr><td>질의 방식</td><td>SQL</td><td>Key 기반 조회, Query, Scan</td></tr>
+<tr><td>장점</td><td>정합성, 조인, 트랜잭션</td><td>확장성, 서버리스, 높은 처리량</td></tr>
+<tr><td>주의점</td><td>Connection, Index, Lock 관리</td><td>Partition Key 설계 중요</td></tr>
+</table>
+<div class="tip">회원, 주문, 결제처럼 관계와 정합성이 중요한 데이터는 RDS/Aurora가 적합하고, 메시지, 로그, 이벤트처럼 빠른 읽기/쓰기가 중요한 데이터는 DynamoDB가 적합하다.</div>
+</section>
+
+<section class="box">
+<h2>3. Amazon RDS 핵심</h2>
+<p>RDS는 AWS가 운영체제, DB 엔진 설치, 백업, 패치, 장애 조치 등을 관리하는 관계형 데이터베이스 서비스이다.</p>
+<div class="grid">
+<div class="card"><b>DB Instance</b>실제 데이터베이스 서버</div>
+<div class="card"><b>DB Subnet Group</b>RDS가 배치될 Subnet 묶음</div>
+<div class="card"><b>Parameter Group</b>DB 엔진 설정값 관리</div>
+<div class="card"><b>Option Group</b>DB 엔진별 추가 기능 관리</div>
+</div>
+<h3>Terraform 예시: RDS MySQL</h3>
+<pre>resource "aws_db_subnet_group" "main" {
+  name = "skills-db-subnet"
+  subnet_ids = [
+    aws_subnet.db_a.id,
+    aws_subnet.db_b.id
+  ]
+}
+
+resource "aws_db_instance" "main" {
+  identifier          = "skills-db"
+  engine              = "mysql"
+  engine_version      = "8.0"
+  instance_class      = "db.t3.micro"
+  allocated_storage   = 20
+  db_subnet_group_name = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.db.id]
+  username            = var.db_username
+  password            = var.db_password
+  skip_final_snapshot = true
+}</pre>
+<div class="warn">실전 과제에서는 편의를 위해 skip_final_snapshot = true를 쓰기도 하지만, 운영 환경에서는 데이터 손실 위험이 있으므로 신중해야 한다.</div>
+</section>
+
+<section class="box">
+<h2>4. DB Subnet Group과 Security Group</h2>
+<p>RDS는 일반적으로 Private Subnet에 배치한다. DB Subnet Group은 RDS가 어느 Subnet에 생성될지 지정하는 리소스이다.</p>
+<table>
+<tr><th>항목</th><th>권장 설계</th></tr>
+<tr><td>Subnet</td><td>서로 다른 AZ의 Private DB Subnet 2개 이상</td></tr>
+<tr><td>Public Access</td><td>false 권장</td></tr>
+<tr><td>Inbound</td><td>App Security Group에서만 DB Port 허용</td></tr>
+<tr><td>DB Port</td><td>MySQL 3306, PostgreSQL 5432</td></tr>
+</table>
+<pre>resource "aws_security_group" "db" {
+  name   = "skills-db-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app.id]
+  }
+}</pre>
+<div class="tip">DB Security Group은 CIDR보다 App Security Group을 Source로 지정하는 것이 안전하고 실무적이다.</div>
+</section>
+
+<section class="box">
+<h2>5. Multi-AZ와 Read Replica</h2>
+<table>
+<tr><th>구분</th><th>목적</th><th>특징</th></tr>
+<tr><td>Multi-AZ</td><td>고가용성</td><td>Standby DB 자동 장애 조치</td></tr>
+<tr><td>Read Replica</td><td>읽기 부하 분산</td><td>비동기 복제, 읽기 전용</td></tr>
+</table>
+<div class="diagram">Multi-AZ
+Primary DB ──동기 복제── Standby DB
+장애 발생 시 자동 Failover
+
+Read Replica
+Primary DB ──비동기 복제── Read Replica
+조회 트래픽 분산</div>
+<div class="warn">Read Replica는 읽기 전용이므로 쓰기 작업을 보내면 오류가 발생한다.</div>
+</section>
+
+<section class="box">
+<h2>6. Amazon Aurora</h2>
+<p>Aurora는 MySQL/PostgreSQL과 호환되는 AWS 최적화 관계형 데이터베이스이다. 일반 RDS보다 고성능, 빠른 장애 조치, 자동 스토리지 확장이 강점이다.</p>
+<div class="grid">
+<div class="card"><b>Writer Endpoint</b>쓰기 작업용 엔드포인트</div>
+<div class="card"><b>Reader Endpoint</b>읽기 작업용 엔드포인트</div>
+<div class="card"><b>Shared Storage</b>여러 인스턴스가 공유하는 분산 스토리지</div>
+</div>
+<pre>resource "aws_rds_cluster" "main" {
+  cluster_identifier = "skills-aurora"
+  engine             = "aurora-mysql"
+  database_name      = "skills"
+  master_username    = var.db_username
+  master_password    = var.db_password
+  db_subnet_group_name = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.db.id]
+  skip_final_snapshot = true
+}</pre>
+<div class="tip">Aurora를 사용할 때 애플리케이션은 쓰기 작업에는 Writer Endpoint, 읽기 작업에는 Reader Endpoint를 사용하도록 분리할 수 있다.</div>
+</section>
+
+<section class="box">
+<h2>7. DynamoDB 핵심</h2>
+<p>DynamoDB는 서버리스 NoSQL 데이터베이스이다. 서버 관리가 필요 없고, Key 설계에 따라 높은 성능을 낼 수 있다.</p>
+<table>
+<tr><th>구성 요소</th><th>설명</th></tr>
+<tr><td>Partition Key</td><td>데이터를 분산 저장하는 기준 키</td></tr>
+<tr><td>Sort Key</td><td>같은 Partition Key 안에서 정렬/범위 조회 기준</td></tr>
+<tr><td>Attribute</td><td>Item이 가지는 속성</td></tr>
+<tr><td>Billing Mode</td><td>PAY_PER_REQUEST 또는 Provisioned</td></tr>
+</table>
+<h3>메시지 테이블 설계 예시</h3>
+<div class="diagram">Table: messages
+Partition Key: room_id
+Sort Key: timestamp
+Attributes: user_id, message, created_at</div>
+<pre>resource "aws_dynamodb_table" "messages" {
+  name         = "messages"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "room_id"
+  range_key    = "timestamp"
+
+  attribute {
+    name = "room_id"
+    type = "S"
+  }
+
+  attribute {
+    name = "timestamp"
+    type = "S"
+  }
+}</pre>
+<div class="warn">Partition Key가 특정 값에만 몰리면 Hot Partition이 발생하여 성능 저하와 Throttling이 발생할 수 있다.</div>
+</section>
+
+<section class="box">
+<h2>8. DAX와 Lambda + DynamoDB 패턴</h2>
+<p>DAX는 DynamoDB Accelerator로, 읽기 요청이 많은 서비스에서 지연시간을 줄이기 위한 인메모리 캐시이다.</p>
+<div class="diagram">Client
+  ↓
+API Gateway
+  ↓
+Lambda
+  ↓
+DAX 또는 DynamoDB
+  ↓
+DynamoDB Table</div>
+<div class="grid">
+<div class="card"><b>API Gateway</b>HTTP 요청 진입점</div>
+<div class="card"><b>Lambda</b>비즈니스 로직 실행</div>
+<div class="card"><b>DynamoDB</b>메시지/이벤트 저장</div>
+<div class="card"><b>DAX</b>읽기 성능 향상 캐시</div>
+</div>
+<div class="tip">기능경기 자동화 과제에서는 API Gateway + Lambda + DynamoDB 조합이 자주 사용된다.</div>
+</section>
+
+<section class="box">
+<h2>9. 트랜잭션과 ACID</h2>
+<p>트랜잭션은 하나의 논리적 작업 단위이다. 예를 들어 계좌 이체는 출금과 입금이 모두 성공해야 한다.</p>
+<table>
+<tr><th>ACID</th><th>의미</th><th>설명</th></tr>
+<tr><td>Atomicity</td><td>원자성</td><td>전부 성공 또는 전부 실패</td></tr>
+<tr><td>Consistency</td><td>일관성</td><td>트랜잭션 전후 데이터 규칙 유지</td></tr>
+<tr><td>Isolation</td><td>격리성</td><td>동시 트랜잭션 간 간섭 제어</td></tr>
+<tr><td>Durability</td><td>지속성</td><td>커밋된 데이터는 장애 후에도 보존</td></tr>
+</table>
+<h3>Deadlock 예시</h3>
+<div class="diagram">Tx1: Row A Lock 획득 → Row B 대기
+Tx2: Row B Lock 획득 → Row A 대기
+결과: 서로 기다리며 Deadlock 발생</div>
+</section>
+
+<section class="box">
+<h2>10. DB 장애 대응</h2>
+<h3>DB 접속 안 됨</h3>
+<ul class="check"><li>DB Endpoint가 올바른가?</li><li>DB Port가 맞는가? MySQL 3306, PostgreSQL 5432</li><li>App SG에서 DB SG로 Inbound가 열려 있는가?</li><li>DB가 Private Subnet에 있고 App도 접근 가능한 경로에 있는가?</li><li>사용자명/비밀번호/DB 이름이 맞는가?</li></ul>
+<h3>Too many connections</h3>
+<ul class="check"><li>Connection Pool을 사용하는가?</li><li>애플리케이션이 연결을 닫고 있는가?</li><li>DatabaseConnections 지표가 급증했는가?</li></ul>
+<h3>Slow Query</h3>
+<ul class="check"><li>인덱스가 있는가?</li><li>Full Table Scan이 발생하는가?</li><li>ORDER BY, GROUP BY가 인덱스를 활용하는가?</li><li>Slow Query Log를 확인했는가?</li></ul>
+</section>
+
+<section class="box">
+<h2>11. CloudWatch 모니터링 지표</h2>
+<table>
+<tr><th>서비스</th><th>주요 지표</th><th>확인 의미</th></tr>
+<tr><td>RDS/Aurora</td><td>CPUUtilization</td><td>DB CPU 병목</td></tr>
+<tr><td>RDS/Aurora</td><td>DatabaseConnections</td><td>연결 수 과다</td></tr>
+<tr><td>RDS/Aurora</td><td>FreeStorageSpace</td><td>스토리지 부족</td></tr>
+<tr><td>RDS/Aurora</td><td>FreeableMemory</td><td>메모리 부족</td></tr>
+<tr><td>Aurora</td><td>AuroraReplicaLag</td><td>Reader 복제 지연</td></tr>
+<tr><td>DynamoDB</td><td>ThrottledRequests</td><td>처리량 제한 또는 Hot Partition</td></tr>
+</table>
+<div class="tip">애플리케이션이 느릴 때 서버 CPU만 보지 말고 DB Connection, Slow Query, Lock, Latency를 함께 확인해야 한다.</div>
+</section>
+
+<section class="box">
+<h2>12. 기능경기 실전 체크리스트</h2>
+<ul class="check">
+<li>DB Subnet Group이 서로 다른 AZ의 Private Subnet으로 구성되었는가?</li>
+<li>RDS publicly_accessible이 불필요하게 true가 아닌가?</li>
+<li>DB Security Group이 App Security Group에서만 접근 가능하도록 구성되었는가?</li>
+<li>환경변수 DB_HOST, DB_USER, DB_PASSWORD, DB_NAME이 올바른가?</li>
+<li>DynamoDB Partition Key와 Sort Key가 문제 요구사항과 일치하는가?</li>
+<li>Lambda에서 DynamoDB 접근 IAM 권한이 있는가?</li>
+<li>CloudWatch Logs에서 DB 연결 오류를 확인했는가?</li>
+</ul>
+</section>
+
+<section class="box">
+<h2>13. 출제 예상 포인트</h2>
+<div class="grid">
+<div class="card"><b>기본</b>RDS 생성, DB Subnet Group, Security Group 연결</div>
+<div class="card"><b>중급</b>DynamoDB 테이블 생성, Lambda 연동, API 저장/조회</div>
+<div class="card"><b>고급</b>Aurora Cluster, DAX, Read Replica, 장애 조치 구성</div>
+</div>
+<div class="tip">데이터베이스 문제는 “생성 여부”보다 “애플리케이션에서 정상 접속·저장·조회되는지”가 최종 검증 기준이다.</div>
+</section>
+
+<div class="next"><a class="btn" href="chapter2-network.html">← Chapter 2</a><a class="btn" href="chapter4-docker-ecs.html">다음: Chapter 4 →</a></div>
+</main>
+</body>
+</html>

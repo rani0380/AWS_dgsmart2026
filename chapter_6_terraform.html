@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 6. Terraform IaC 실전</title>
+  <style>
+*{box-sizing:border-box}body{margin:0;font-family:'Noto Sans KR',sans-serif;background:#f1f5f9;color:#1e293b;line-height:1.75}header{background:linear-gradient(135deg,#1e3a5f,#0ea5e9);padding:38px 20px;color:white}header .wrap,main{max-width:1050px;margin:auto}header h1{margin:0;font-size:32px;color:white}header p{margin:8px 0 0;color:#e0f2fe}nav{background:#0f172a;padding:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:10}nav a{color:#cbd5e1;text-decoration:none;padding:9px 13px;border-radius:10px;font-weight:700;font-size:14px}nav a:hover,.active{background:#0ea5e9;color:white}main{padding:30px 18px}.box{background:white;border-radius:18px;padding:26px;margin-bottom:22px;box-shadow:0 4px 18px rgba(0,0,0,.08)}h2{font-size:25px;color:#0f172a;border-bottom:3px solid #e2e8f0;padding-bottom:8px;margin-top:0}h3{font-size:18px;color:#1e3a5f;margin-top:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.card{background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #0ea5e9;border-radius:14px;padding:16px}.card b{display:block;color:#0f172a;margin-bottom:5px}.tip{background:#fffbeb;border-left:6px solid #f59e0b;padding:16px;border-radius:12px;margin:18px 0;color:#92400e}.warn{background:#fef2f2;border-left:6px solid #ef4444;padding:16px;border-radius:12px;margin:18px 0;color:#991b1b}pre{background:#0f172a;color:#e2e8f0;padding:16px;border-radius:12px;overflow:auto;font-size:13px;line-height:1.65}table{width:100%;border-collapse:collapse;background:white;margin:14px 0}th,td{border:1px solid #e2e8f0;padding:10px;text-align:left;vertical-align:top}th{background:#e0f2fe}.next{display:flex;justify-content:space-between;gap:10px}.btn{display:inline-block;background:#0ea5e9;color:white;text-decoration:none;border-radius:10px;padding:10px 16px;font-weight:800}.check li{margin:7px 0}.diagram{background:#f8fafc;border:1px dashed #94a3b8;border-radius:14px;padding:16px;font-family:monospace;white-space:pre;overflow:auto}
+  </style>
+</head>
+<body>
+<header><div class="wrap"><h1>Chapter 6. Terraform IaC 실전</h1><p>VPC · ECS · EKS · RDS · 모듈화 · 디버깅 · 기능경기 풀이 패턴</p></div></header>
+<nav>
+<a href="index.html">홈</a><a href="chapter1-linux.html">1 Linux</a><a href="chapter2-network.html">2 Network</a><a href="chapter3-database.html">3 Database</a><a href="chapter4-docker-ecs.html">4 Docker/ECS</a><a href="chapter5-eks.html">5 EKS</a><a class="active" href="chapter6-terraform.html">6 Terraform</a><a href="chapter7-monitoring.html">7 Monitoring</a><a href="chapter8-serverless.html">8 Serverless</a>
+</nav>
+<main>
+<section class="box">
+<h2>1. Terraform이 중요한 이유</h2>
+<p>Terraform은 인프라를 코드로 정의하고 자동 생성하는 IaC 도구이다. 기능경기대회에서는 AWS Console을 클릭해서 구성하는 것보다 Terraform으로 빠르고 정확하게 반복 배포하는 능력이 중요하다.</p>
+<div class="grid">
+<div class="card"><b>재현성</b>같은 코드를 실행하면 같은 인프라를 다시 만들 수 있음</div>
+<div class="card"><b>속도</b>VPC, ECS, EKS, RDS를 한 번에 생성 가능</div>
+<div class="card"><b>검증</b>plan을 통해 변경 사항을 사전에 확인 가능</div>
+<div class="card"><b>버전관리</b>Git으로 코드 변경 이력을 관리 가능</div>
+</div>
+<div class="tip">기능경기 실전에서는 “빠르게 만들기”보다 “재실행해도 깨지지 않는 코드”를 작성하는 것이 중요하다.</div>
+</section>
+
+<section class="box">
+<h2>2. 기본 파일 구조</h2>
+<p>규모가 작은 문제는 하나의 main.tf로도 가능하지만, 실전에서는 리소스별로 파일을 나누는 것이 안전하다.</p>
+<div class="diagram">terraform/
+├─ provider.tf
+├─ variables.tf
+├─ terraform.tfvars
+├─ network.tf
+├─ security.tf
+├─ iam.tf
+├─ ecs.tf
+├─ eks.tf
+├─ database.tf
+└─ outputs.tf</div>
+<table><tr><th>파일</th><th>역할</th></tr><tr><td>provider.tf</td><td>AWS Provider와 Region 설정</td></tr><tr><td>variables.tf</td><td>입력 변수 선언</td></tr><tr><td>terraform.tfvars</td><td>변수 실제 값 지정</td></tr><tr><td>outputs.tf</td><td>ALB DNS, VPC ID 등 결과 출력</td></tr><tr><td>network.tf</td><td>VPC, Subnet, Route Table, NAT 구성</td></tr></table>
+</section>
+
+<section class="box">
+<h2>3. Terraform 실행 흐름</h2>
+<pre>terraform init
+terraform fmt
+terraform validate
+terraform plan
+terraform apply
+terraform destroy</pre>
+<table><tr><th>명령어</th><th>설명</th></tr><tr><td>init</td><td>Provider와 Module 초기화</td></tr><tr><td>fmt</td><td>코드 형식 정리</td></tr><tr><td>validate</td><td>문법 검증</td></tr><tr><td>plan</td><td>생성/수정/삭제 미리보기</td></tr><tr><td>apply</td><td>실제 인프라 반영</td></tr><tr><td>destroy</td><td>생성한 리소스 삭제</td></tr></table>
+<div class="warn">plan 없이 바로 apply하면 잘못된 삭제나 비용 발생 리소스 생성을 놓칠 수 있다.</div>
+</section>
+
+<section class="box">
+<h2>4. Provider와 변수</h2>
+<h3>provider.tf</h3>
+<pre>terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.region
+}</pre>
+<h3>variables.tf</h3>
+<pre>variable "region" {
+  type    = string
+  default = "ap-northeast-2"
+}
+
+variable "project_name" {
+  type    = string
+  default = "skills"
+}
+
+variable "vpc_cidr" {
+  type    = string
+  default = "10.0.0.0/16"
+}</pre>
+<h3>terraform.tfvars</h3>
+<pre>region       = "ap-northeast-2"
+project_name = "skills"
+vpc_cidr     = "10.0.0.0/16"</pre>
+</section>
+
+<section class="box">
+<h2>5. VPC Terraform 기본 패턴</h2>
+<pre>resource "aws_vpc" "main" {
+  cidr_block           = var.vpc_cidr
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+
+  tags = {
+    Name = "${var.project_name}-vpc"
+  }
+}
+
+resource "aws_subnet" "public_a" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "ap-northeast-2a"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project_name}-public-a"
+  }
+}
+
+resource "aws_subnet" "private_a" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.11.0/24"
+  availability_zone = "ap-northeast-2a"
+
+  tags = {
+    Name = "${var.project_name}-private-a"
+  }
+}</pre>
+<div class="tip">EKS와 ECS에서는 enable_dns_support, enable_dns_hostnames를 true로 설정하는 것이 좋다.</div>
+</section>
+
+<section class="box">
+<h2>6. Route Table과 NAT Gateway</h2>
+<pre>resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+}
+
+resource "aws_route" "public_default" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main.id
+}
+
+resource "aws_eip" "nat" {
+  domain = "vpc"
+}
+
+resource "aws_nat_gateway" "main" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public_a.id
+}
+
+resource "aws_route" "private_default" {
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.main.id
+}</pre>
+<div class="warn">NAT Gateway는 Public Subnet에 있어야 하며, Private Route Table이 NAT Gateway를 향해야 한다.</div>
+</section>
+
+<section class="box">
+<h2>7. Security Group 패턴</h2>
+<p>실전에서는 Source CIDR보다 Security Group 참조 방식이 안전하다.</p>
+<pre>resource "aws_security_group" "alb" {
+  name   = "skills-alb-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "app" {
+  name   = "skills-app-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }
+}</pre>
+</section>
+
+<section class="box">
+<h2>8. ECS Terraform 핵심</h2>
+<pre>resource "aws_ecs_cluster" "main" {
+  name = "${var.project_name}-cluster"
+}
+
+resource "aws_cloudwatch_log_group" "app" {
+  name              = "/ecs/${var.project_name}-app"
+  retention_in_days = 7
+}
+
+resource "aws_ecs_service" "app" {
+  name            = "${var.project_name}-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.app.arn
+  desired_count   = 2
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets         = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+    security_groups = [aws_security_group.app.id]
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.app.arn
+    container_name   = "app"
+    container_port   = 8080
+  }
+}</pre>
+<div class="tip">ECS Service와 Target Group 연결 시 container_name, container_port가 Task Definition과 일치해야 한다.</div>
+</section>
+
+<section class="box">
+<h2>9. EKS Terraform 핵심</h2>
+<p>EKS는 IAM Role, VPC/Subnet, Node Group, Addon, aws-auth 구성이 중요하다. 실전에서는 Terraform 공식 모듈을 활용하면 속도를 높일 수 있다.</p>
+<pre>module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 20.0"
+
+  cluster_name    = "${var.project_name}-eks"
+  cluster_version = "1.30"
+
+  vpc_id     = aws_vpc.main.id
+  subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+
+  eks_managed_node_groups = {
+    default = {
+      instance_types = ["t3.medium"]
+      min_size       = 1
+      max_size       = 3
+      desired_size   = 2
+    }
+  }
+}</pre>
+<div class="warn">EKS Node가 Join하지 못하면 IAM Role, Subnet Route, Security Group, aws-auth 설정을 확인한다.</div>
+</section>
+
+<section class="box">
+<h2>10. RDS와 DynamoDB Terraform</h2>
+<h3>RDS</h3>
+<pre>resource "aws_db_subnet_group" "main" {
+  name       = "skills-db-subnet"
+  subnet_ids = [aws_subnet.private_db_a.id, aws_subnet.private_db_b.id]
+}
+
+resource "aws_db_instance" "main" {
+  identifier             = "skills-db"
+  engine                 = "mysql"
+  instance_class         = "db.t3.micro"
+  allocated_storage      = 20
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.db.id]
+  username               = var.db_username
+  password               = var.db_password
+  skip_final_snapshot    = true
+}</pre>
+<h3>DynamoDB</h3>
+<pre>resource "aws_dynamodb_table" "messages" {
+  name         = "messages"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "room_id"
+  range_key    = "timestamp"
+
+  attribute {
+    name = "room_id"
+    type = "S"
+  }
+
+  attribute {
+    name = "timestamp"
+    type = "S"
+  }
+}</pre>
+</section>
+
+<section class="box">
+<h2>11. Output과 디버깅</h2>
+<pre>output "alb_dns_name" {
+  value = aws_lb.main.dns_name
+}
+
+output "vpc_id" {
+  value = aws_vpc.main.id
+}</pre>
+<h3>디버깅 명령어</h3>
+<pre>terraform state list
+terraform state show aws_vpc.main
+terraform plan -out=tfplan
+terraform apply tfplan
+terraform init -upgrade</pre>
+<table><tr><th>오류</th><th>원인</th><th>대응</th></tr><tr><td>already exists</td><td>동일 리소스 존재</td><td>이름 변경 또는 import</td></tr><tr><td>AccessDenied</td><td>IAM 권한 부족</td><td>정책 확인</td></tr><tr><td>Dependency cycle</td><td>상호 참조</td><td>참조 구조 수정</td></tr><tr><td>Invalid subnet</td><td>AZ/서브넷 불일치</td><td>Subnet ID 확인</td></tr></table>
+</section>
+
+<section class="box">
+<h2>12. 기능경기 풀이 순서</h2>
+<ol class="check"><li>Network: VPC, Subnet, IGW, NAT, Route Table, SG</li><li>IAM: ECS/EKS/Lambda/RDS 접근 Role과 Policy</li><li>Storage/DB: RDS, DynamoDB, S3</li><li>Compute: ECS Service 또는 EKS Deployment</li><li>Load Balancer: ALB, Target Group, Listener</li><li>DNS: Route 53 Alias</li><li>Monitoring: CloudWatch Logs, Alarm</li><li>검증: curl, kubectl, AWS CLI, CloudWatch Logs</li></ol>
+<div class="tip">가장 안전한 순서는 Network → IAM → DB → Compute → ALB → DNS → Monitoring이다.</div>
+</section>
+
+<section class="box">
+<h2>13. 실전 체크리스트</h2>
+<ul class="check"><li>terraform fmt를 실행했는가?</li><li>terraform validate가 성공했는가?</li><li>terraform plan 결과에서 삭제 리소스가 없는가?</li><li>VPC/Subnet CIDR이 겹치지 않는가?</li><li>Public/Private Route Table Association이 정확한가?</li><li>ECS/EKS IAM Role이 정확한가?</li><li>ALB DNS Output을 출력했는가?</li><li>배포 후 실제 URL로 테스트했는가?</li></ul>
+</section>
+
+<section class="box"><h2>14. 출제 예상 포인트</h2><div class="grid"><div class="card"><b>기본</b>VPC, Subnet, Route, SG Terraform 작성</div><div class="card"><b>중급</b>ECS Fargate, ALB, RDS, DynamoDB 자동 생성</div><div class="card"><b>고급</b>EKS Module, IRSA, Remote State, Multi-AZ 설계</div></div></section>
+
+<div class="next"><a class="btn" href="chapter5-eks.html">← Chapter 5</a><a class="btn" href="chapter7-monitoring.html">다음: Chapter 7 →</a></div>
+</main>
+</body>
+</html>
