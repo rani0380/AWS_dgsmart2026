@@ -11,7 +11,7 @@
 <body>
 <header><div class="wrap"><h1>Chapter 5. Kubernetes & EKS 실전</h1><p>kubectl · Deployment · Service · Ingress · HPA · 장애 대응</p></div></header>
 <nav>
-<a href="index.html">홈</a><a href="chapter1-linux.html">1 Linux</a><a href="chapter2-network.html">2 Network</a><a href="chapter3-database.html">3 Database</a><a href="chapter4-docker-ecs.html">4 Docker/ECS</a><a class="active" href="chapter5-eks.html">5 EKS</a><a href="chapter6-terraform.html">6 Terraform</a><a href="chapter7-monitoring.html">7 Monitoring</a><a href="chapter8-serverless.html">8 Serverless</a>
+<a href="index.html">홈</a><a class="active" href="chapter_1_linux.html">1.Linux</a><a href="chapter_2_network.html">2.Network</a><a href="chapter_3_database.html">3.Database</a><a href="chapter_4_docker_ecs.html">4.Docker/ECS</a><a href="chapter_5_eks.html">5.EKS</a><a href="chapter_6_terraform.html">6.Terraform</a><a href="chapter_7_monitoring.html">7.Monitoring</a><a href="chapter_8_serverless.html">8.Serverless</a>
 </nav>
 <main>
 <section class="box"><h2>1. EKS가 중요한 이유</h2><p>Amazon EKS는 AWS에서 제공하는 관리형 Kubernetes 서비스이다. 기능경기에서는 컨테이너 애플리케이션을 Kubernetes 방식으로 배포하고, Service와 Ingress를 통해 외부에 노출하며, 장애 원인을 kubectl로 분석하는 능력이 중요하다.</p><div class="grid"><div class="card"><b>Control Plane</b>API Server, Scheduler, Controller, etcd는 AWS가 관리</div><div class="card"><b>Worker Node</b>Pod가 실제 실행되는 EC2 기반 노드</div><div class="card"><b>Pod</b>컨테이너 실행의 최소 단위</div><div class="card"><b>Ingress</b>ALB와 연동해 HTTP/HTTPS 트래픽을 라우팅</div></div><div class="tip">EKS 문제는 리소스 생성보다 kubectl로 상태를 확인하고 원인을 찾는 과정이 더 중요하다.</div></section>
