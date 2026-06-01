@@ -1,154 +1,91 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>기능경기대회 클라우드컴퓨팅 실전 웹교재</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>SkillsKorea</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #f9fafb;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background-image: url('main.jpeg');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      padding: 100px 20px;
+      text-align: center;
+      position: relative;
+    }
+    header::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.45); /* 어두운 반투명 오버레이 */
+    }
+    header h1 {
+      position: relative;
+      z-index: 1;
+      font-size: 2.5em;
+      margin: 0;
+    }
+    section {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #1e3a8a;
+      border-bottom: 2px solid #1e40af;
+      padding-bottom: 8px;
+    }
+    ul {
+      list-style-type: square;
+      margin-left: 20px;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #f1f5f9;
+      color: #555;
+      font-size: 0.9em;
+    }
+    @media (max-width: 600px) {
+      header { padding: 60px 10px; }
+      section { margin: 20px; }
+    }
+  </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <h1>🏆 전국기능경기대회 클라우드컴퓨팅 실전 웹교재</h1>
-    <p>AWS · EKS · Terraform · Docker · Monitoring · Serverless</p>
-  </div>
-</header>
 
-<nav>
-  <a class="active" href="index.html">홈</a>
-  <a href="chapter_1_linux.html">1.Linux</a>
-  <a href="chapter_2_network.html">2.Network</a>
-  <a href="chapter_3_database.html">3.Database</a>
-  <a href="chapter_4_docker_ecs.html">4.Docker/ECS</a>
-  <a href="chapter_5_eks.html">5.EKS</a>
-  <a href="chapter_6_terraform.html">6.Terraform</a>
-  <a href="chapter_7_monitoring.html">7.Monitoring</a>
-  <a href="chapter_8_serverless.html">8.Serverless</a>
-</nav>
+  <header>
+    <h1>Korea Skills Concert</h1>
+  </header>
 
-<main>
-  <section class="box">
-    <h2>📘 웹교재 소개</h2>
+  <section id="about">
+    <h2>About Us</h2>
     <p>
-      이 웹교재는 전국기능경기대회 클라우드컴퓨팅 직종을 준비하는 학생들을 위한
-      실전형 학습 자료임. 단순 개념 암기가 아니라, AWS 인프라 구축, 컨테이너 배포,
-      Kubernetes 운영, Terraform 자동화, 장애 대응까지 실제 대회 문제 풀이 흐름에 맞춰 구성함.
+      It provides a reliable concert system. It's running on the cloud. You can easily book tickets. Do not stress out anymore about the slow system.<br>
     </p>
-    <div class="tip">
-      학습 순서: Linux → Network → Database → Docker/ECS → EKS → Terraform → Monitoring → Serverless
-    </div>
   </section>
 
-  <section class="box">
-    <h2>🧭 전체 학습 로드맵</h2>
-    <div class="grid">
-      <div class="card">
-        <b>Chapter 1. Linux 운영체제 실전</b>
-        EC2, Docker, EKS Worker Node 운영을 위한 Linux 기본 명령어와 장애 대응 학습
-        <br><a class="btn" href="chapter_1_linux.html">학습하기</a>
-      </div>
-      <div class="card">
-        <b>Chapter 2. AWS 네트워크 실전</b>
-        VPC, Subnet, Route Table, IGW, NAT Gateway, Security Group, ALB, DNS 구성 학습
-        <br><a class="btn" href="chapter_2_network.html">학습하기</a>
-      </div>
-      <div class="card">
-        <b>Chapter 3. 데이터베이스 실전</b>
-        RDS, Aurora, DynamoDB, DAX, Transaction, Slow Query, DB 장애 대응 학습
-        <br><a class="btn" href="chapter_3_database.html">학습하기</a>
-      </div>
-      <div class="card">
-        <b>Chapter 4. Docker & ECS 실전</b>
-        Dockerfile, ECR Push, ECS Task Definition, Fargate, ALB Health Check 학습
-        <br><a class="btn" href="chapter_4_docker_ecs.html">학습하기</a>
-      </div>
-      <div class="card">
-        <b>Chapter 5. Kubernetes & EKS 실전</b>
-        kubectl, Deployment, Service, Ingress, ConfigMap, Secret, HPA, EKS 장애 대응 학습
-        <br><a class="btn" href="chapter_5_eks.html">학습하기</a>
-      </div>
-      <div class="card">
-        <b>Chapter 6. Terraform IaC 실전</b>
-        VPC, ECS, EKS, RDS, DynamoDB를 Terraform으로 자동 구축하는 방법 학습
-        <br><a class="btn" href="chapter_6_terraform.html">학습하기</a>
-      </div>
-      <div class="card">
-        <b>Chapter 7. Monitoring & Observability</b>
-        CloudWatch Logs, Metrics, Alarm, ALB/ECS/EKS/RDS 장애 분석 학습
-        <br><a class="btn" href="chapter_7_monitoring.html">학습하기</a>
-      </div>
-      <div class="card">
-        <b>Chapter 8. Serverless & Event-Driven</b>
-        Lambda, API Gateway, SQS, SNS, EventBridge, DynamoDB 자동화 아키텍처 학습
-        <br><a class="btn" href="chapter_8_serverless.html">학습하기</a>
-      </div>
-    </div>
+  <section id="how-it-works">
+    <h2>How It Works</h2>
+    <p>
+      It is working on the cloud-based servers. The company uses Serverless, container and database services.
+    </p>
   </section>
 
-  <section class="box">
-    <h2>🏗️ 실전 구축 흐름</h2>
-    <div class="diagram">1. Linux 기본 점검
-   ↓
-2. VPC / Subnet / Route / Security Group 구성
-   ↓
-3. RDS 또는 DynamoDB 데이터 저장소 구성
-   ↓
-4. Docker 이미지 빌드 및 ECR Push
-   ↓
-5. ECS 또는 EKS에 애플리케이션 배포
-   ↓
-6. ALB / Ingress / Route 53 연결
-   ↓
-7. CloudWatch Logs와 Metrics로 검증
-   ↓
-8. Lambda / SQS / SNS / EventBridge 자동화 구성</div>
-  </section>
+  <footer>
+    © WS Korea CloudComputing 2026.
+  </footer>
 
-  <section class="box">
-    <h2>✅ 대회 당일 기본 체크리스트</h2>
-    <ul class="check">
-      <li>AWS CLI 자격 증명이 정상 설정되었는가?</li>
-      <li>Region이 문제 요구사항과 일치하는가?</li>
-      <li>Terraform init, fmt, validate, plan, apply 순서를 지켰는가?</li>
-      <li>VPC, Subnet, Route Table, Security Group 이름이 요구사항과 일치하는가?</li>
-      <li>ECR 이미지 Push가 완료되었는가?</li>
-      <li>ECS Task 또는 EKS Pod가 Running 상태인가?</li>
-      <li>ALB Target Group Health Check가 Healthy 상태인가?</li>
-      <li>CloudWatch Logs에 오류가 없는가?</li>
-      <li>브라우저 또는 curl로 최종 URL 응답을 확인했는가?</li>
-    </ul>
-  </section>
-
-  <section class="box">
-    <h2>💡 학습 팁</h2>
-    <div class="grid">
-      <div class="card">
-        <b>1. 먼저 네트워크를 잡기</b>
-        대부분의 장애는 VPC, Route Table, Security Group에서 발생합니다.
-      </div>
-      <div class="card">
-        <b>2. 로그를 먼저 보기</b>
-        추측하지 말고 CloudWatch Logs, kubectl logs, describe 결과를 먼저 확인합니다.
-      </div>
-      <div class="card">
-        <b>3. Terraform으로 반복 연습</b>
-        같은 인프라를 여러 번 생성·삭제하면서 코드 구조를 익힙니다.
-      </div>
-      <div class="card">
-        <b>4. 최종 검증까지 하기</b>
-        리소스 생성이 끝이 아니라 실제 서비스 접속 성공이 최종 목표입니다.
-      </div>
-    </div>
-  </section>
-
-  <div class="next">
-    <span></span>
-    <a class="btn" href="chapter_1_linux.html">Chapter1. 시작하기 →</a>
-  </div>
-</main>
-
-<footer>
-  전국기능경기대회 클라우드컴퓨팅 실전 웹교재 | AWS · EKS · Terraform
-</footer>
 </body>
 </html>
+
