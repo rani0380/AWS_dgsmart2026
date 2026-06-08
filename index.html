@@ -1,91 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>SkillsKorea</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background-color: #f9fafb;
-      margin: 0;
-      padding: 0;
-      color: #333;
-    }
-    header {
-      background-image: url('main.jpeg');
-      background-size: cover;
-      background-position: center;
-      color: white;
-      padding: 100px 20px;
-      text-align: center;
-      position: relative;
-    }
-    header::after {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.45); /* 어두운 반투명 오버레이 */
-    }
-    header h1 {
-      position: relative;
-      z-index: 1;
-      font-size: 2.5em;
-      margin: 0;
-    }
-    section {
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    h2 {
-      color: #1e3a8a;
-      border-bottom: 2px solid #1e40af;
-      padding-bottom: 8px;
-    }
-    ul {
-      list-style-type: square;
-      margin-left: 20px;
-    }
-    footer {
-      text-align: center;
-      padding: 20px;
-      background-color: #f1f5f9;
-      color: #555;
-      font-size: 0.9em;
-    }
-    @media (max-width: 600px) {
-      header { padding: 60px 10px; }
-      section { margin: 20px; }
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026 전국기능경기대회 클라우드컴퓨팅 AWS 학습</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <header>
-    <h1>Korea Skills Concert</h1>
+  <header class="home-hero">
+    <div class="wrap">
+      <p class="eyebrow">Skills Korea Cloud Computing 2026</p>
+      <h1>AWS 실전 학습 사이트</h1>
+      <p class="lead">Linux, Network, Database, Docker/ECS, EKS, Terraform, Monitoring, Serverless를 기능경기 실전 흐름으로 정리했습니다.</p>
+      <div class="hero-actions">
+        <a class="btn" href="chapter_1_linux.html">학습 시작</a>
+        <a class="btn secondary" href="2026_전국기능경기대회_클라우드컴퓨팅_제1과제_v3.docx">과제 문서</a>
+      </div>
+    </div>
   </header>
 
-  <section id="about">
-    <h2>About Us</h2>
-    <p>
-      It provides a reliable concert system. It's running on the cloud. You can easily book tickets. Do not stress out anymore about the slow system.<br>
-    </p>
-  </section>
+  <nav aria-label="주요 학습 목차">
+    <a class="active" href="index.html">홈</a>
+    <a href="chapter_1_linux.html">1. Linux</a>
+    <a href="chapter_2_network.html">2. Network</a>
+    <a href="chapter_3_database.html">3. Database</a>
+    <a href="chapter_4_docker_ecs.html">4. Docker/ECS</a>
+    <a href="chapter_5_eks.html">5. EKS</a>
+    <a href="chapter_6_terraform.html">6. Terraform</a>
+    <a href="chapter_7_monitoring.html">7. Monitoring</a>
+    <a href="chapter_8_serverless.html">8. Serverless</a>
+  </nav>
 
-  <section id="how-it-works">
-    <h2>How It Works</h2>
-    <p>
-      It is working on the cloud-based servers. The company uses Serverless, container and database services.
-    </p>
-  </section>
+  <main>
+    <section class="box intro-box">
+      <h2>학습 목표</h2>
+      <p>이 사이트는 AWS 콘솔 조작만 외우는 자료가 아니라, 장애 원인을 찾고 서비스가 실제로 동작하는지 검증하는 실전형 학습 자료입니다. 각 챕터는 기능경기 과제에서 자주 만나는 서비스 구성, 명령어, 체크리스트를 중심으로 정리되어 있습니다.</p>
+      <div class="grid">
+        <div class="card"><b>구축</b>VPC, ECS, EKS, RDS, Lambda 같은 AWS 리소스를 목적에 맞게 구성합니다.</div>
+        <div class="card"><b>검증</b>로그, 메트릭, 헬스체크, CLI 명령으로 정상 동작을 확인합니다.</div>
+        <div class="card"><b>장애 대응</b>접속 실패, 배포 실패, 권한 오류, 성능 문제를 단계적으로 분석합니다.</div>
+      </div>
+    </section>
+
+    <section class="box">
+      <h2>챕터 바로가기</h2>
+      <div class="chapter-grid">
+        <a class="chapter-card" href="chapter_1_linux.html">
+          <span>Chapter 1</span>
+          <b>Linux 운영체제 실전</b>
+          <p>EC2, Docker, EKS Worker Node 운영을 위한 기본 명령과 점검 흐름</p>
+        </a>
+        <a class="chapter-card" href="chapter_2_network.html">
+          <span>Chapter 2</span>
+          <b>AWS 네트워크 실전</b>
+          <p>VPC, Subnet, Routing, DNS, Load Balancer, EKS Networking</p>
+        </a>
+        <a class="chapter-card" href="chapter_3_database.html">
+          <span>Chapter 3</span>
+          <b>데이터베이스 실전</b>
+          <p>RDS, Aurora, DynamoDB, 트랜잭션, 모니터링, 장애 대응</p>
+        </a>
+        <a class="chapter-card" href="chapter_4_docker_ecs.html">
+          <span>Chapter 4</span>
+          <b>Docker & ECS 실전</b>
+          <p>Dockerfile, ECR, ECS Fargate, ALB, Task Definition</p>
+        </a>
+        <a class="chapter-card" href="chapter_5_eks.html">
+          <span>Chapter 5</span>
+          <b>Kubernetes & EKS 실전</b>
+          <p>Deployment, Service, Ingress, HPA, kubectl 장애 분석</p>
+        </a>
+        <a class="chapter-card" href="chapter_6_terraform.html">
+          <span>Chapter 6</span>
+          <b>Terraform IaC 실전</b>
+          <p>VPC, ECS, EKS, RDS 자동화와 모듈화, 디버깅 패턴</p>
+        </a>
+        <a class="chapter-card" href="chapter_7_monitoring.html">
+          <span>Chapter 7</span>
+          <b>Monitoring & Observability</b>
+          <p>CloudWatch Logs, Metrics, Alarm, 서비스별 장애 증거 수집</p>
+        </a>
+        <a class="chapter-card" href="chapter_8_serverless.html">
+          <span>Chapter 8</span>
+          <b>Serverless & Event-Driven</b>
+          <p>Lambda, API Gateway, SQS, SNS, EventBridge, DynamoDB 패턴</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="box">
+      <h2>실전 학습 순서</h2>
+      <ol class="study-flow">
+        <li>Linux와 Network로 서버와 통신 흐름을 먼저 잡습니다.</li>
+        <li>Database, Docker/ECS, EKS로 애플리케이션 배포 구조를 이해합니다.</li>
+        <li>Terraform으로 반복 가능한 인프라 구성을 연습합니다.</li>
+        <li>Monitoring과 Serverless로 운영, 자동화, 장애 대응까지 마무리합니다.</li>
+      </ol>
+      <div class="tip">대회 준비에서는 “만들었다”보다 “외부에서 정상 응답하고, 실패 시 원인을 설명할 수 있다”가 더 중요합니다.</div>
+    </section>
+  </main>
 
   <footer>
-    © WS Korea CloudComputing 2026.
+    2026 전국기능경기대회 클라우드컴퓨팅 AWS 학습 자료
   </footer>
-
 </body>
 </html>
-

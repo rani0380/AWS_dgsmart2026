@@ -5,15 +5,24 @@
 body {
   margin: 0;
   font-family: 'Noto Sans KR', 'Segoe UI', sans-serif;
-  background: #f1f5f9;
+  background: #f6f8fb;
   color: #1e293b;
   line-height: 1.75;
 }
 
 header {
-  background: linear-gradient(135deg, #1e3a5f, #0ea5e9);
+  background: linear-gradient(135deg, #172554, #0369a1);
   padding: 40px 20px;
   color: white;
+}
+
+.home-hero {
+  background:
+    linear-gradient(90deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.58)),
+    url('main.jpeg') center / cover;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
 }
 
 header .wrap {
@@ -31,6 +40,26 @@ header p {
   margin-top: 10px;
   color: #e0f2fe;
   font-size: 16px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #bae6fd;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.lead {
+  max-width: 720px;
+  font-size: 18px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 22px;
 }
 
 nav {
@@ -70,10 +99,11 @@ main {
 
 .box {
   background: white;
-  border-radius: 18px;
+  border-radius: 8px;
   padding: 26px;
   margin-bottom: 22px;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
 }
 
 h2 {
@@ -104,7 +134,7 @@ p {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-left: 5px solid #0ea5e9;
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 16px;
 }
 
@@ -118,7 +148,7 @@ p {
   background: #fffbeb;
   border-left: 6px solid #f59e0b;
   padding: 16px;
-  border-radius: 12px;
+  border-radius: 8px;
   margin: 18px 0;
   color: #92400e;
 }
@@ -127,7 +157,7 @@ p {
   background: #fef2f2;
   border-left: 6px solid #ef4444;
   padding: 16px;
-  border-radius: 12px;
+  border-radius: 8px;
   margin: 18px 0;
   color: #991b1b;
 }
@@ -136,7 +166,7 @@ pre {
   background: #0f172a;
   color: #e2e8f0;
   padding: 16px;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow-x: auto;
   font-size: 13px;
   line-height: 1.65;
@@ -173,7 +203,7 @@ th {
 .diagram {
   background: #f8fafc;
   border: 1px dashed #94a3b8;
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 16px;
   font-family: monospace;
   white-space: pre-wrap;
@@ -191,7 +221,7 @@ th {
   background: #0ea5e9;
   color: white;
   text-decoration: none;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 11px 18px;
   font-weight: 800;
   transition: 0.2s ease;
@@ -199,6 +229,69 @@ th {
 
 .btn:hover {
   background: #0284c7;
+}
+
+.btn.secondary {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.intro-box {
+  margin-top: 28px;
+}
+
+.chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+}
+
+.chapter-card {
+  min-height: 176px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  color: #1e293b;
+  text-decoration: none;
+  background: #f8fafc;
+  border: 1px solid #dbe4ef;
+  border-top: 4px solid #0ea5e9;
+  border-radius: 8px;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.chapter-card:hover {
+  transform: translateY(-2px);
+  border-color: #38bdf8;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+}
+
+.chapter-card span {
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.chapter-card b {
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.chapter-card p {
+  margin: 0;
+}
+
+.study-flow {
+  padding-left: 22px;
+}
+
+.study-flow li {
+  margin: 8px 0;
 }
 
 footer {
@@ -211,6 +304,14 @@ footer {
 @media (max-width: 768px) {
   header h1 {
     font-size: 24px;
+  }
+
+  .home-hero {
+    min-height: 380px;
+  }
+
+  .lead {
+    font-size: 16px;
   }
 
   nav {
@@ -229,5 +330,9 @@ footer {
 
   .btn {
     text-align: center;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
   }
 }
