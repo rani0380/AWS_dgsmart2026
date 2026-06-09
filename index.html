@@ -1,107 +1,125 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>2026 전국기능경기대회 클라우드컴퓨팅 AWS 학습</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>2026 전국기능경기대회 클라우드컴퓨팅 AWS 학습</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="home-hero">
-    <div class="wrap">
-      <p class="eyebrow">Skills Korea Cloud Computing 2026</p>
-      <h1>AWS 실전 학습 사이트</h1>
-      <p class="lead">Linux, Network, Database, Docker/ECS, EKS, Terraform, Monitoring, Serverless를 기능경기 실전 흐름으로 정리했습니다.</p>
-      <div class="hero-actions">
-        <a class="btn" href="chapter_1_linux.html">학습 시작</a>
-        <a class="btn secondary" href="2026_전국기능경기대회_클라우드컴퓨팅_제1과제_v3.docx">과제 문서</a>
-      </div>
+<header class="home-hero">
+  <div class="wrap">
+    <p class="eyebrow">Skills Korea Cloud Computing 2026</p>
+    <h1>AWS 실전 학습 사이트</h1>
+    <p class="lead">Linux, Network, Database, Docker/ECS, EKS, Terraform, Monitoring, Serverless를 기능경기 실전 흐름으로 정리했습니다.</p>
+    <div class="hero-actions">
+      <a class="btn" href="chapter_aws_basic.html">AWS 기초부터 시작</a>
+      <a class="btn secondary" href="chapter_1_linux.html">실전 학습 시작</a>
+      <a class="btn secondary" href="2026_전국기능경기대회_클라우드컴퓨팅_제1과제_v3.docx">과제 문서</a>
     </div>
-  </header>
+  </div>
+</header>
 
-  <nav aria-label="주요 학습 목차">
-    <a class="active" href="index.html">홈</a>
-    <a href="chapter_1_linux.html">1. Linux</a>
-    <a href="chapter_2_network.html">2. Network</a>
-    <a href="chapter_3_database.html">3. Database</a>
-    <a href="chapter_4_docker_ecs.html">4. Docker/ECS</a>
-    <a href="chapter_5_eks.html">5. EKS</a>
-    <a href="chapter_6_terraform.html">6. Terraform</a>
-    <a href="chapter_7_monitoring.html">7. Monitoring</a>
-    <a href="chapter_8_serverless.html">8. Serverless</a>
-  </nav>
+<nav aria-label="주요 학습 목차">
+  <a class="active" href="index.html">홈</a>
+  <a href="chapter_aws_basic.html">AWS 기초</a>
+  <a href="chapter_1_linux.html">1. Linux</a>
+  <a href="chapter_2_network.html">2. Network</a>
+  <a href="chapter_3_database.html">3. Database</a>
+  <a href="chapter_4_docker_ecs.html">4. Docker/ECS</a>
+  <a href="chapter_5_eks.html">5. EKS</a>
+  <a href="chapter_6_terraform.html">6. Terraform</a>
+  <a href="chapter_7_monitoring.html">7. Monitoring</a>
+  <a href="chapter_8_serverless.html">8. Serverless</a>
+</nav>
 
-  <main>
-    <section class="box intro-box">
-      <h2>학습 목표</h2>
-      <p>이 사이트는 AWS 콘솔 조작만 외우는 자료가 아니라, 장애 원인을 찾고 서비스가 실제로 동작하는지 검증하는 실전형 학습 자료입니다. 각 챕터는 기능경기 과제에서 자주 만나는 서비스 구성, 명령어, 체크리스트를 중심으로 정리되어 있습니다.</p>
-      <div class="grid">
-        <div class="card"><b>구축</b>VPC, ECS, EKS, RDS, Lambda 같은 AWS 리소스를 목적에 맞게 구성합니다.</div>
-        <div class="card"><b>검증</b>로그, 메트릭, 헬스체크, CLI 명령으로 정상 동작을 확인합니다.</div>
-        <div class="card"><b>장애 대응</b>접속 실패, 배포 실패, 권한 오류, 성능 문제를 단계적으로 분석합니다.</div>
-      </div>
-    </section>
+<main>
+  <section class="box intro-box">
+    <h2>학습 목표</h2>
+    <p>이 사이트는 AWS 콘솔 조작만 외우는 자료가 아니라, 장애 원인을 찾고 서비스가 실제로 동작하는지 검증하는 실전형 학습 자료입니다. 각 챕터는 기능경기 과제에서 자주 만나는 서비스 구성, 명령어, 체크리스트를 중심으로 정리되어 있습니다.</p>
+    <div class="grid">
+      <div class="card"><b>구축</b>VPC, ECS, EKS, RDS, Lambda 같은 AWS 리소스를 목적에 맞게 구성합니다.</div>
+      <div class="card"><b>검증</b>로그, 메트릭, 헬스체크, CLI 명령으로 정상 동작을 확인합니다.</div>
+      <div class="card"><b>장애 대응</b>접속 실패, 배포 실패, 권한 오류, 성능 문제를 단계적으로 분석합니다.</div>
+    </div>
+  </section>
 
-    <section class="box">
-      <h2>챕터 바로가기</h2>
-      <div class="chapter-grid">
-        <a class="chapter-card" href="chapter_1_linux.html">
-          <span>Chapter 1</span>
-          <b>Linux 운영체제 실전</b>
-          <p>EC2, Docker, EKS Worker Node 운영을 위한 기본 명령과 점검 흐름</p>
-        </a>
-        <a class="chapter-card" href="chapter_2_network.html">
-          <span>Chapter 2</span>
-          <b>AWS 네트워크 실전</b>
-          <p>VPC, Subnet, Routing, DNS, Load Balancer, EKS Networking</p>
-        </a>
-        <a class="chapter-card" href="chapter_3_database.html">
-          <span>Chapter 3</span>
-          <b>데이터베이스 실전</b>
-          <p>RDS, Aurora, DynamoDB, 트랜잭션, 모니터링, 장애 대응</p>
-        </a>
-        <a class="chapter-card" href="chapter_4_docker_ecs.html">
-          <span>Chapter 4</span>
-          <b>Docker & ECS 실전</b>
-          <p>Dockerfile, ECR, ECS Fargate, ALB, Task Definition</p>
-        </a>
-        <a class="chapter-card" href="chapter_5_eks.html">
-          <span>Chapter 5</span>
-          <b>Kubernetes & EKS 실전</b>
-          <p>Deployment, Service, Ingress, HPA, kubectl 장애 분석</p>
-        </a>
-        <a class="chapter-card" href="chapter_6_terraform.html">
-          <span>Chapter 6</span>
-          <b>Terraform IaC 실전</b>
-          <p>VPC, ECS, EKS, RDS 자동화와 모듈화, 디버깅 패턴</p>
-        </a>
-        <a class="chapter-card" href="chapter_7_monitoring.html">
-          <span>Chapter 7</span>
-          <b>Monitoring & Observability</b>
-          <p>CloudWatch Logs, Metrics, Alarm, 서비스별 장애 증거 수집</p>
-        </a>
-        <a class="chapter-card" href="chapter_8_serverless.html">
-          <span>Chapter 8</span>
-          <b>Serverless & Event-Driven</b>
-          <p>Lambda, API Gateway, SQS, SNS, EventBridge, DynamoDB 패턴</p>
-        </a>
-      </div>
-    </section>
+  <section class="box">
+    <h2>챕터 바로가기</h2>
+    <div class="chapter-grid">
 
-    <section class="box">
-      <h2>실전 학습 순서</h2>
-      <ol class="study-flow">
-        <li>Linux와 Network로 서버와 통신 흐름을 먼저 잡습니다.</li>
-        <li>Database, Docker/ECS, EKS로 애플리케이션 배포 구조를 이해합니다.</li>
-        <li>Terraform으로 반복 가능한 인프라 구성을 연습합니다.</li>
-        <li>Monitoring과 Serverless로 운영, 자동화, 장애 대응까지 마무리합니다.</li>
-      </ol>
-      <div class="tip">대회 준비에서는 “만들었다”보다 “외부에서 정상 응답하고, 실패 시 원인을 설명할 수 있다”가 더 중요합니다.</div>
-    </section>
-  </main>
+      <a class="chapter-card" href="chapter_aws_basic.html" style="border-color:#4da6ff33; background:linear-gradient(135deg,#0f2040,#141824);">
+        <span style="color:#4da6ff;">기초</span>
+        <b>AWS 기초 입문</b>
+        <p>클라우드 개념, IAM, EC2, S3, VPC, RDS/DynamoDB — 경기 준비 핵심 개념 총정리</p>
+      </a>
 
-  <footer>
-    2026 전국기능경기대회 클라우드컴퓨팅 AWS 학습 자료
-  </footer>
+      <a class="chapter-card" href="chapter_1_linux.html">
+        <span>Chapter 1</span>
+        <b>Linux 운영체제 실전</b>
+        <p>EC2, Docker, EKS Worker Node 운영을 위한 기본 명령과 점검 흐름</p>
+      </a>
+
+      <a class="chapter-card" href="chapter_2_network.html">
+        <span>Chapter 2</span>
+        <b>AWS 네트워크 실전</b>
+        <p>VPC, Subnet, Routing, DNS, Load Balancer, EKS Networking</p>
+      </a>
+
+      <a class="chapter-card" href="chapter_3_database.html">
+        <span>Chapter 3</span>
+        <b>데이터베이스 실전</b>
+        <p>RDS, Aurora, DynamoDB, 트랜잭션, 모니터링, 장애 대응</p>
+      </a>
+
+      <a class="chapter-card" href="chapter_4_docker_ecs.html">
+        <span>Chapter 4</span>
+        <b>Docker & ECS 실전</b>
+        <p>Dockerfile, ECR, ECS Fargate, ALB, Task Definition</p>
+      </a>
+
+      <a class="chapter-card" href="chapter_5_eks.html">
+        <span>Chapter 5</span>
+        <b>Kubernetes & EKS 실전</b>
+        <p>Deployment, Service, Ingress, HPA, kubectl 장애 분석</p>
+      </a>
+
+      <a class="chapter-card" href="chapter_6_terraform.html">
+        <span>Chapter 6</span>
+        <b>Terraform IaC 실전</b>
+        <p>VPC, ECS, EKS, RDS 자동화와 모듈화, 디버깅 패턴</p>
+      </a>
+
+      <a class="chapter-card" href="chapter_7_monitoring.html">
+        <span>Chapter 7</span>
+        <b>Monitoring & Observability</b>
+        <p>CloudWatch Logs, Metrics, Alarm, 서비스별 장애 증거 수집</p>
+      </a>
+
+      <a class="chapter-card" href="chapter_8_serverless.html">
+        <span>Chapter 8</span>
+        <b>Serverless & Event-Driven</b>
+        <p>Lambda, API Gateway, SQS, SNS, EventBridge, DynamoDB 패턴</p>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>실전 학습 순서</h2>
+    <ol class="study-flow">
+      <li><b>AWS 기초</b>부터 시작해 클라우드 개념과 핵심 서비스(IAM, EC2, S3, VPC, DB)를 잡습니다.</li>
+      <li>Linux와 Network로 서버와 통신 흐름을 익힙니다.</li>
+      <li>Database, Docker/ECS, EKS로 애플리케이션 배포 구조를 이해합니다.</li>
+      <li>Terraform으로 반복 가능한 인프라 구성을 연습합니다.</li>
+      <li>Monitoring과 Serverless로 운영, 자동화, 장애 대응까지 마무리합니다.</li>
+    </ol>
+    <div class="tip">대회 준비에서는 "만들었다"보다 "외부에서 정상 응답하고, 실패 시 원인을 설명할 수 있다"가 더 중요합니다.</div>
+  </section>
+</main>
+
+<footer>
+  2026 전국기능경기대회 클라우드컴퓨팅 AWS 학습 자료
+</footer>
 </body>
 </html>
