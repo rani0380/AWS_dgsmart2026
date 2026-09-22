@@ -18,6 +18,19 @@ details[open] summary{background:#e0f2fe;color:#075985}
 .resource-list .btn{min-width:180px;text-align:center}.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
 .check-item{padding:14px;border-radius:10px;background:#f8fafc;border-left:5px solid #22c55e}
 @media(max-width:768px){.task-hero{min-height:300px}.score{font-size:28px}}
+
+.score-submit{border:2px solid #38bdf8;background:linear-gradient(145deg,#f8fbff,#eef8ff);box-shadow:0 18px 45px rgba(14,165,233,.12)}
+.score-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.score-live{min-width:170px;padding:15px 20px;border-radius:14px;background:#0f172a;color:#fff;text-align:center}
+.score-live strong{display:block;font-size:34px;color:#38bdf8}.student-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.student-grid label,.score-output-label{display:flex;flex-direction:column;gap:7px;font-weight:800;color:#0f172a}
+.student-grid input,.score-table input,.score-output{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:9px;padding:11px;background:#fff;color:#0f172a;font:inherit}
+.score-table input{text-align:center;min-width:74px}.score-output{min-height:260px;resize:vertical;font-family:Consolas,monospace;font-size:13px;line-height:1.55}
+.submit-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.submit-actions button{border:0;cursor:pointer}
+.submit-actions button:disabled{opacity:.55;cursor:not-allowed}.submit-status{font-weight:800;margin:14px 0 0}.submit-status.ok{color:#047857}.submit-status.error{color:#b91c1c}
+.safe-confirm{display:flex;align-items:flex-start;gap:8px;margin-top:12px}.safe-confirm input{margin-top:5px}.hidden-frame,.bot-trap{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+@media(max-width:768px){.student-grid{grid-template-columns:1fr}.score-table{font-size:13px}.score-table th,.score-table td{padding:8px 5px}}
+
 </style>
 </head>
 <body>
@@ -223,7 +236,117 @@ aws dynamodb get-item --table-name destination-db \
 <div class="tip">채점은 unicorn-mark CloudShell VPC Environment에서 진행합니다. 종료 직전에는 같은 환경에서 AWS CLI와 kubectl 검증을 한 번 더 실행하세요.</div>
 <div class="next"><a class="btn" href="index.html">← 홈으로</a><a class="btn" href="chapter_1_linux.html">Linux 실전 학습 →</a></div>
 </section>
+
+<section class="box score-submit" id="score-submit">
+<div class="score-head">
+  <div><p class="eyebrow">Student score submission</p><h2>학생 채점 결과 제출</h2>
+  <p>채점 스크립트를 실행한 뒤 영역별 점수를 입력하고, 터미널에 표시된 전체 결과를 붙여넣어 제출하세요. 결과는 선생님의 Google 스프레드시트에 자동 저장됩니다.</p></div>
+  <div class="score-live"><span>현재 총점</span><strong id="score-total">0.0</strong><span>/ 30점</span></div>
+</div>
+<div class="tip"><b>개인정보·보안 주의:</b> AWS Access Key, Secret Access Key, Session Token, 비밀번호는 절대 제출하지 마세요. 채점 명령의 출력 결과만 붙여넣으세요.</div>
+<form id="score-form" method="post" target="score-submit-frame" action="https://script.google.com/macros/s/AKfycbxWCYdfnV5a8nVyLDI8B2sEMOGHLcKb61bNX_tgQ2rETZJjd82igTsSpbqzB94EQ9zQMA/exec" novalidate>
+  <input type="hidden" name="taskKey" value="dgsmart-task1-2026">
+  <input type="hidden" name="taskName" value="AWS_dgsmart2026_제1과제">
+  <input type="hidden" name="submittedAt">
+  <input type="hidden" name="pageUrl">
+  <input type="hidden" name="scoreOutput">
+  <div class="student-grid">
+    <label>비번호 <input name="studentNo" maxlength="30" autocomplete="off" required placeholder="예: 260101"></label>
+    <label>이름 <input name="studentName" maxlength="50" autocomplete="name" required placeholder="학생 이름"></label>
+    <label>학교/소속 <input name="school" maxlength="100" autocomplete="organization" value="대구스마트고등학교"></label>
+  </div>
+  <h3>영역별 채점표</h3>
+  <div style="overflow-x:auto">
+  <table class="score-table">
+    <thead><tr><th>채점 영역</th><th>배점</th><th>취득점수</th><th>확인 기준</th></tr></thead>
+    <tbody>
+      <tr><td>Networking</td><td>2.0</td><td><input class="score-input" data-label="Networking" type="number" min="0" max="2" step="0.5" value="0"></td><td>VPC·Subnet·NAT·Endpoint·Flow Log</td></tr>
+      <tr><td>KMS</td><td>1.0</td><td><input class="score-input" data-label="KMS" type="number" min="0" max="1" step="0.5" value="0"></td><td>3개 키·자동 교체·권한</td></tr>
+      <tr><td>S3·DynamoDB·ECR</td><td>3.0</td><td><input class="score-input" data-label="S3·DynamoDB·ECR" type="number" min="0" max="3" step="0.5" value="0"></td><td>암호화·보호·이미지 스캔</td></tr>
+      <tr><td>EKS</td><td>3.0</td><td><input class="score-input" data-label="EKS" type="number" min="0" max="3" step="0.5" value="0"></td><td>Cluster·NodeGroup·Workload</td></tr>
+      <tr><td>Lambda</td><td>1.0</td><td><input class="score-input" data-label="Lambda" type="number" min="0" max="1" step="0.5" value="0"></td><td>조회 함수·CMK·로그</td></tr>
+      <tr><td>Service Endpoint</td><td>5.5</td><td><input class="score-input" data-label="Service Endpoint" type="number" min="0" max="5.5" step="0.5" value="0"></td><td>ALB·CloudFront·WAF·요청 테스트</td></tr>
+      <tr><td>Security·Application</td><td>3.0</td><td><input class="score-input" data-label="Security·Application" type="number" min="0" max="3" step="0.5" value="0"></td><td>Audit Role·Health·앱 동작</td></tr>
+      <tr><td>Observability·Runtime·Grafana</td><td>5.5</td><td><input class="score-input" data-label="Observability·Runtime·Grafana" type="number" min="0" max="5.5" step="0.5" value="0"></td><td>로그·메트릭·대시보드</td></tr>
+      <tr><td>DynamoDB Stream 추가과제</td><td>6.0</td><td><input class="score-input" data-label="DynamoDB Stream" type="number" min="0" max="6" step="0.5" value="0"></td><td>Stream·Lambda·total_price·TTL</td></tr>
+    </tbody>
+  </table></div>
+  <label class="score-output-label">채점 스크립트 실행 결과
+    <textarea id="raw-score-output" class="score-output" rows="16" maxlength="43000" required placeholder="CloudShell에서 채점 스크립트를 실행한 뒤 출력 전체를 여기에 붙여넣으세요."></textarea>
+  </label>
+  <label class="bot-trap" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
+  <label class="safe-confirm"><input type="checkbox" name="safeConfirmed" value="yes" required> <span>제출 내용에 Access Key·Secret Key·Session Token·비밀번호가 포함되지 않았음을 확인했습니다.</span></label>
+  <div class="submit-actions">
+    <button class="btn" type="submit" id="score-submit-button">Google 스프레드시트로 제출</button>
+    <button class="btn secondary" type="button" id="score-download">결과 TXT 저장</button>
+  </div>
+  <p id="submit-status" class="submit-status" role="status" aria-live="polite"></p>
+</form>
+<iframe class="hidden-frame" name="score-submit-frame" id="score-submit-frame" title="채점 결과 제출 응답"></iframe>
+</section>
+
 </main>
 <footer>2026 전국기능경기대회 클라우드컴퓨팅 제1과제 학습용 기출풀이</footer>
+
+<script>
+(function(){
+  const form=document.getElementById('score-form');
+  if(!form)return;
+  const inputs=[...document.querySelectorAll('.score-input')];
+  const totalEl=document.getElementById('score-total');
+  const raw=document.getElementById('raw-score-output');
+  const status=document.getElementById('submit-status');
+  const submitButton=document.getElementById('score-submit-button');
+  let submitted=false;
+  function total(){
+    const value=inputs.reduce((sum,input)=>sum+(Number(input.value)||0),0);
+    totalEl.textContent=value.toFixed(1);
+    return value;
+  }
+  function summary(){
+    const lines=['[AWS 제1과제 학생 채점 결과]','총점: '+total().toFixed(1)+' / 30.0'];
+    inputs.forEach(input=>lines.push('- '+input.dataset.label+': '+(Number(input.value)||0).toFixed(1)+' / '+Number(input.max).toFixed(1)));
+    lines.push('','[채점 스크립트 원문]',raw.value.trim());
+    return lines.join('\n');
+  }
+  function secretFound(value){
+    return /AKIA[0-9A-Z]{16}/.test(value)
+      || /(aws_secret_access_key|aws_session_token)\s*[=:]/i.test(value)
+      || /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/.test(value);
+  }
+  inputs.forEach(input=>input.addEventListener('input',()=>{
+    let value=Number(input.value)||0;
+    value=Math.max(0,Math.min(Number(input.max),value));
+    input.value=value; total();
+  }));
+  form.addEventListener('submit',event=>{
+    status.className='submit-status';
+    if(!form.reportValidity()){event.preventDefault();return;}
+    if(total()>30){event.preventDefault();status.textContent='총점은 30점을 넘을 수 없습니다.';status.classList.add('error');return;}
+    if(secretFound(raw.value)){event.preventDefault();status.textContent='AWS 키 또는 Session Token으로 보이는 내용이 있습니다. 민감정보를 삭제한 뒤 제출하세요.';status.classList.add('error');return;}
+    form.elements.submittedAt.value=new Date().toISOString();
+    form.elements.pageUrl.value=window.location.href;
+    form.elements.scoreOutput.value=summary();
+    submitted=true;submitButton.disabled=true;
+    status.textContent='Google 스프레드시트로 전송 중입니다…';
+  });
+  document.getElementById('score-submit-frame').addEventListener('load',()=>{
+    if(!submitted)return;
+    submitted=false;submitButton.disabled=false;
+    status.textContent='제출 요청을 전송했습니다. 선생님 현황판에서 결과를 확인할 수 있습니다.';
+    status.className='submit-status ok';
+  });
+  document.getElementById('score-download').addEventListener('click',()=>{
+    if(!raw.value.trim()){status.textContent='먼저 채점 스크립트 결과를 붙여넣으세요.';status.className='submit-status error';return;}
+    const no=form.elements.studentNo.value.trim()||'unknown';
+    const name=form.elements.studentName.value.trim()||'unknown';
+    const content=['비번호: '+no,'이름: '+name,'제출시각: '+new Date().toLocaleString('ko-KR'),'',summary()].join('\n');
+    const url=URL.createObjectURL(new Blob([content],{type:'text/plain;charset=utf-8'}));
+    const link=document.createElement('a');link.href=url;link.download='task1-score-'+no+'-'+name+'.txt';link.click();URL.revokeObjectURL(url);
+  });
+  total();
+})();
+</script>
+
 </body>
 </html>
