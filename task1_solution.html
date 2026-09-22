@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>2026 전국기능경기대회 클라우드컴퓨팅 1과제 기출풀이</title>
+<link rel="stylesheet" href="style.css" />
+<style>
+.task-hero{background:linear-gradient(110deg,rgba(15,23,42,.94),rgba(3,105,161,.82)),url('main.jpeg') center/cover;min-height:340px;display:flex;align-items:center}
+.task-hero .lead{max-width:850px}.score{font-size:34px;font-weight:900;color:#0ea5e9}.roadmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;counter-reset:step}
+.roadmap div{counter-increment:step;background:#f8fafc;border:1px solid #dbe4ef;border-radius:10px;padding:15px}
+.roadmap div:before{content:counter(step);display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#0ea5e9;color:white;font-weight:900;margin-right:7px}
+details{border:1px solid #dbe4ef;border-radius:10px;margin:12px 0;background:#fff;overflow:hidden}
+summary{cursor:pointer;padding:16px 18px;font-weight:900;color:#0f172a;background:#f8fafc}
+details[open] summary{background:#e0f2fe;color:#075985}
+.detail-body{padding:4px 18px 18px}.badge{display:inline-block;padding:3px 9px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-weight:800;font-size:12px;margin-left:6px}
+.command{position:relative}.mini{font-size:13px;color:#64748b}.resource-list{display:flex;gap:10px;flex-wrap:wrap}
+.resource-list .btn{min-width:180px;text-align:center}.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.check-item{padding:14px;border-radius:10px;background:#f8fafc;border-left:5px solid #22c55e}
+@media(max-width:768px){.task-hero{min-height:300px}.score{font-size:28px}}
+</style>
+</head>
+<body>
+<header class="task-hero"><div class="wrap">
+<p class="eyebrow">2026 Skills Korea · Cloud Computing</p>
+<h1>제1과제 기출풀이</h1>
+<p class="lead">Unicorn Tickets 콘서트 예약 플랫폼을 AWS에 구축하는 4시간 실전 과제입니다. 채점 기준에 맞춰 구축 순서, 핵심 설정, 검증 명령어를 한 페이지로 정리했습니다.</p>
+<div class="hero-actions"><a class="btn" href="#solve">풀이 시작</a><a class="btn secondary" href="#score">배점 확인</a><a class="btn secondary" href="#final-check">최종 점검</a></div>
+</div></header>
+<nav aria-label="주요 학습 목차">
+  <a href="index.html">홈</a>
+  <a href="chapter_aws_basic.html">AWS 기초</a>
+  <a href="aws_notes.html">AWS 한글 핵심 노트</a>
+  <a class="active" href="task1_solution.html">1과제 기출풀이</a>
+  <a href="chapter_1_linux.html">1. Linux</a>
+  <a href="chapter_2_network.html">2. Network</a>
+  <a href="chapter_3_database.html">3. Database</a>
+  <a href="chapter_4_docker_ecs.html">4. Docker/ECS</a>
+  <a href="chapter_5_eks.html">5. EKS</a>
+  <a href="chapter_6_terraform.html">6. Terraform</a>
+  <a href="chapter_7_monitoring.html">7. Monitoring</a>
+  <a href="chapter_8_serverless.html">8. Serverless</a>
+</nav>
+<main>
+<section class="box">
+<h2>과제 한눈에 보기</h2>
+<div class="grid">
+<div class="card"><b>경기 시간</b><span class="score">4시간</span><br>기본과제와 추가과제를 제한 시간 안에 구축</div>
+<div class="card"><b>총점</b><span class="score">30점</span><br>서비스 엔드포인트와 DynamoDB Stream 비중이 큼</div>
+<div class="card"><b>기본 리전</b><span class="score" style="font-size:23px">서울</span><br>ap-northeast-2<br><span class="mini">CloudFront·WAF·Platform KMS 일부는 us-east-1</span></div>
+</div>
+<div class="tip"><b>풀이 원칙:</b> 이름·태그·대소문자를 과제지와 정확히 일치시키고, 리소스를 만든 직후 채점 명령으로 검증합니다. 마지막에 한꺼번에 확인하면 수정 시간이 부족합니다.</div>
+</section>
+
+<section class="box">
+<h2>권장 구축 순서</h2>
+<div class="roadmap">
+<div><b>Networking</b><br>VPC·Subnet·NAT·Endpoint</div>
+<div><b>KMS</b><br>App·Data·Platform 키</div>
+<div><b>Data</b><br>S3·DynamoDB·ECR</div>
+<div><b>EKS</b><br>Cluster·NodeGroup·Workload</div>
+<div><b>Endpoint</b><br>Lambda·ALB·CloudFront·WAF</div>
+<div><b>운영</b><br>IAM·Logs·Prometheus·Grafana</div>
+<div><b>추가과제</b><br>DynamoDB Stream·Lambda</div>
+<div><b>검증</b><br>Runtime Test·채점 명령</div>
+</div>
+</section>
+
+<section class="box" id="score">
+<h2>배점 전략</h2>
+<table>
+<thead><tr><th>영역</th><th>배점</th><th>우선순위와 핵심</th></tr></thead>
+<tbody>
+<tr><td>Networking</td><td>2.0</td><td>CIDR, 라우팅, S3/ECR Endpoint, Flow Log</td></tr>
+<tr><td>KMS·S3·Database·ECR</td><td>4.0</td><td>각 1점. 이름·암호화·보호 설정을 빠르게 확보</td></tr>
+<tr><td>EKS</td><td>3.0</td><td>Private Control Plane, NodeGroup 분리, Workload</td></tr>
+<tr><td>Lambda</td><td>1.0</td><td>조회 함수, Platform CMK, 지정 로그 그룹</td></tr>
+<tr><td>Service Endpoint</td><td>5.5</td><td>ALB·CloudFront·POST/GET·직접접근 차단·WAF</td></tr>
+<tr><td>Security·Application</td><td>3.0</td><td>Audit Role 최소권한, Health·환경변수·앱 동작</td></tr>
+<tr><td>Observability·Runtime·Grafana</td><td>5.5</td><td>로그 필터, 메트릭, 실제 요청 테스트, 대시보드</td></tr>
+<tr><td><b>DynamoDB Stream</b></td><td><b>6.0</b></td><td>추가과제 최대 배점. 기본 인프라 완성 후 진행</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="box" id="solve">
+<h2>단계별 풀이</h2>
+
+<details open><summary>1. Networking <span class="badge">2.0점</span></summary><div class="detail-body">
+<p><b>unicorn-vpc</b>를 10.97.0.0/16으로 만들고 3개 AZ에 Public/Private 서브넷을 각각 구성합니다.</p>
+<table><tr><th>구분</th><th>a</th><th>b</th><th>c</th></tr><tr><td>Public</td><td>10.97.0.0/24</td><td>10.97.1.0/24</td><td>10.97.2.0/24</td></tr><tr><td>Private</td><td>10.97.10.0/24</td><td>10.97.11.0/24</td><td>10.97.12.0/24</td></tr></table>
+<ul class="check"><li>Public: unicorn-igw + 공용 unicorn-rt-pub</li><li>Private: AZ별 NAT Gateway와 unicorn-rt-priv-{a,b,c}</li><li>Endpoint: S3, ecr.api, ecr.dkr</li><li>VPC Flow Log 활성화</li><li>Private Subnet에 CloudShell VPC Environment <b>unicorn-mark</b> 구성</li></ul>
+<pre>aws ec2 describe-vpcs --filters Name=tag:Name,Values=unicorn-vpc \
+  --query "Vpcs[].CidrBlock" --output text
+
+aws ec2 describe-subnets --filters Name=tag:Name,Values=unicorn-subnet-* \
+  --query "Subnets[].[Tags[?Key=='Name']|[0].Value,CidrBlock]" --output table</pre>
+</div></details>
+
+<details><summary>2. KMS <span class="badge">1.0점</span></summary><div class="detail-body">
+<p>세 키 모두 <b>90일 자동 교체</b>를 설정합니다. 권한은 실제 사용하는 서비스와 역할에만 부여합니다.</p>
+<table><tr><th>Alias</th><th>용도</th><th>리전/유형</th></tr><tr><td>alias/unicorn-kms-app</td><td>Secrets Manager, DynamoDB</td><td>ap-northeast-2</td></tr><tr><td>alias/unicorn-kms-data</td><td>S3, ECR</td><td>ap-northeast-2</td></tr><tr><td>alias/unicorn-kms-platform</td><td>EKS Secrets·EBS·Logs·Lambda</td><td>us-east-1 다중 리전 키 요구사항 확인</td></tr></table>
+<pre>for a in app data platform; do
+  aws kms get-key-rotation-status \
+    --key-id alias/unicorn-kms-$a \
+    --query "[KeyRotationEnabled,RotationPeriodInDays]" --output text
+done</pre>
+</div></details>
+
+<details><summary>3. S3·DynamoDB·ECR <span class="badge">3.0점</span></summary><div class="detail-body">
+<div class="grid"><div class="card"><b>S3</b>unicorn-web-&lt;ACCOUNT_ID&gt;<br>Public 차단, Versioning, Data CMK</div><div class="card"><b>DynamoDB</b>unicorn-concert-db<br>PAY_PER_REQUEST, PITR, 삭제 방지, App CMK</div><div class="card"><b>ECR</b>unicorn-concert-app<br>Data CMK, Scan on push, Tag immutability 설정</div></div>
+<p>DynamoDB PK는 <b>booking_id</b>, GSI는 <b>client-id-created-at-index</b>이며 client_id를 PK, created_at을 SK로 지정합니다. ECR에는 v1.0.0과 latest 이미지를 올리고 스캔 결과를 확인합니다.</p>
+<pre>aws ecr describe-image-scan-findings \
+  --repository-name unicorn-concert-app --image-id imageTag=v1.0.0
+
+aws dynamodb describe-continuous-backups \
+  --table-name unicorn-concert-db</pre>
+</div></details>
+
+<details><summary>4. EKS와 애플리케이션 <span class="badge">4.5점</span></summary><div class="detail-body">
+<ul class="check"><li>Cluster: unicorn-eks-cluster / 1.35 / Private Endpoint / 모든 Control Plane Log</li><li>App NodeGroup: label unicorn=app, 2대 이상, Private Subnet, Name 태그 unicorn-k8snode-app-node</li><li>Addon NodeGroup: label unicorn=addon, 1대 이상, Name 태그 unicorn-k8snode-addon-node</li><li>Namespace: unicorn / Deployment: unicorn-book-app-deploy / Service: unicorn-book-app-svc</li><li>container name: book / port: 8080 / AWS_REGION·TABLE_NAME 환경변수</li><li>/health 기반 Liveness·Readiness Probe, preStop, terminationGracePeriodSeconds</li><li>Pod Identity Role은 현재 클러스터로 제한하고 DynamoDB 최소권한만 부여</li></ul>
+<pre>kubectl get nodes -L unicorn
+kubectl -n unicorn get deploy,po,svc -o wide
+kubectl -n unicorn describe deploy unicorn-book-app-deploy
+kubectl -n unicorn get po -o jsonpath='{range .items[*]}{.metadata.name}{"  "}{.spec.nodeSelector}{"\n"}{end}'</pre>
+<div class="warn">Addon은 Addon NodeGroup, Book App과 DaemonSet은 요구된 노드에 배치되는지 반드시 실제 Pod 위치로 확인합니다.</div>
+</div></details>
+
+<details><summary>5. Lambda·ALB·CloudFront·WAF <span class="badge">6.5점</span></summary><div class="detail-body">
+<p><b>unicorn-get-booking-func</b>는 booking_id 필수, email·concert_name 선택 조건으로 DynamoDB를 조회하고 JSON을 반환합니다. Platform CMK와 /unicorn/lambda/get-booking 로그 그룹을 사용합니다.</p>
+<table><tr><th>요청</th><th>라우팅 대상</th></tr><tr><td>GET /v1/book</td><td>Lambda Target Group</td></tr><tr><td>POST /v1/book</td><td>EKS Book App Target Group</td></tr><tr><td>GET /health</td><td>EKS Book App Target Group</td></tr></table>
+<ul class="check"><li>unicorn-alb는 Internal, HTTP 80</li><li>CloudFront는 S3 OAC Origin + ALB VPC Origin</li><li>CloudFront Comment: unicorn-svc-cf</li><li>직접 ALB 요청은 거절하고 CloudFront 경유 요청만 허용</li><li>us-east-1 WAF unicorn-waf를 CloudFront에 연결</li><li>CommonRuleSet + KnownBadInputsRuleSet + 60초 50건 Rate Rule</li><li>차단 응답: HTTP 403 / Request blocked by Unicorn WAF</li></ul>
+<pre># CloudFront를 통한 정상 확인
+curl -i https://&lt;CLOUDFRONT_DOMAIN&gt;/health
+
+# XSS 차단 확인
+curl -i "https://&lt;CLOUDFRONT_DOMAIN&gt;/?q=%3Cscript%3Ealert(1)%3C/script%3E"</pre>
+</div></details>
+
+<details><summary>6. Security·Observability·Grafana <span class="badge">4.5점</span></summary><div class="detail-body">
+<p>Audit Role은 <b>unicorn-audit-role</b>, External ID는 <b>unicorn-audit-2026&lt;선수등번호&gt;</b>, 최대 세션은 1시간입니다. DynamoDB 조회와 VPC·EKS Describe만 Inline Policy로 허용합니다.</p>
+<ul class="check"><li>Fluent Bit DaemonSet으로 로그를 10초 이내 CloudWatch 전송</li><li>/health 로그 제외, Log Group /unicorn/eks/book-app</li><li>Prometheus·Grafana는 monitoring Namespace</li><li>Grafana ALB: unicorn-grafana-alb / TG: unicorn-grafana-tg</li><li>Dashboard: unicorn-grafana-dashboard</li><li>Node CPU·Memory, Pod 상태, Ready Pod 수, HTTP 응답시간 패널</li></ul>
+<pre>aws logs tail /unicorn/eks/book-app --since 5m
+kubectl -n monitoring get po,svc,ingress
+kubectl -n monitoring get po -o wide</pre>
+</div></details>
+
+<details><summary>7. DynamoDB Stream 추가과제 <span class="badge">6.0점</span></summary><div class="detail-body">
+<p>source-db에 데이터가 들어오면 Stream으로 컨테이너 이미지 기반 Lambda <b>ticket-processor</b>를 호출합니다. price × amount 값을 <b>total_price</b>로 추가해 destination-db에 60초 안에 저장합니다.</p>
+<ul class="check"><li>두 테이블 PK: ticket_id</li><li>source-db: Stream 활성화 + created_at 기반 TTL 300초</li><li>Lambda: 컨테이너 형식 + Provisioned Concurrency로 콜드스타트 방지</li><li>Event Source Mapping의 시작 위치와 Batch 실패를 점검</li></ul>
+<pre>aws dynamodb put-item --table-name source-db --item '{
+  "ticket_id":{"S":"abcd1111"},
+  "price":{"N":"1000"},
+  "amount":{"N":"3"},
+  "created_at":{"N":"&lt;EPOCH_NOW_PLUS_300&gt;"}
+}'
+
+aws dynamodb get-item --table-name destination-db \
+  --key '{"ticket_id":{"S":"abcd1111"}}'</pre>
+<p class="mini">예상 total_price: 3000. TTL 속성에는 현재 시각이 아니라 만료될 epoch time을 넣습니다.</p>
+</div></details>
+</section>
+
+<section class="box" id="final-check">
+<h2>최종 제출 전 체크리스트</h2>
+<div class="check-grid">
+<div class="check-item"><b>이름·태그</b><br>unicorn-* 대소문자와 Name 태그 확인</div>
+<div class="check-item"><b>암호화</b><br>S3·ECR·DynamoDB·EKS·EBS·Logs·Lambda의 CMK 연결 확인</div>
+<div class="check-item"><b>네트워크</b><br>Private Node, Endpoint, NAT, ALB 직접접근 차단 확인</div>
+<div class="check-item"><b>애플리케이션</b><br>POST·GET·/health 응답과 DynamoDB 저장 확인</div>
+<div class="check-item"><b>운영</b><br>Book App 로그, /health 제외, Prometheus 메트릭 확인</div>
+<div class="check-item"><b>비용·부하</b><br>테스트와 부하 발생기를 종료하고 불필요한 실행을 중지</div>
+</div>
+<div class="tip">채점은 unicorn-mark CloudShell VPC Environment에서 진행합니다. 종료 직전에는 같은 환경에서 AWS CLI와 kubectl 검증을 한 번 더 실행하세요.</div>
+<div class="next"><a class="btn" href="index.html">← 홈으로</a><a class="btn" href="chapter_1_linux.html">Linux 실전 학습 →</a></div>
+</section>
+</main>
+<footer>2026 전국기능경기대회 클라우드컴퓨팅 제1과제 학습용 기출풀이</footer>
+</body>
+</html>
