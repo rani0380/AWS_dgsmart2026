@@ -272,6 +272,70 @@
     .toc { position: static; width: 100%; min-width: 0; }
     .concept-grid { grid-template-columns: 1fr; }
   }
+
+  /* ── 밝은 화면 가독성 보정 ── */
+  body { background: #f4f7fb; color: #17233b; }
+  .toc {
+    background: #ffffff;
+    border-color: #d8e2ee;
+    box-shadow: 0 8px 24px rgba(27, 55, 90, 0.08);
+  }
+  .toc h3 { color: #087fc0; }
+  .toc a { color: #42566f; font-weight: 600; }
+  .toc a:hover { color: #087fc0; }
+  .aws-section {
+    background: #ffffff;
+    border-color: #d8e2ee;
+    box-shadow: 0 10px 28px rgba(27, 55, 90, 0.09);
+  }
+  .aws-section-header {
+    background: #eef6ff;
+    border-bottom-color: #d8e2ee;
+    color: #14243b;
+  }
+  .aws-section-header:hover { background: #e2f1ff; }
+  .aws-section-header h2,
+  .aws-section-body h3,
+  .concept-card h4 { color: #13233b; }
+  .toggle-icon { color: #58708c; }
+  .section-badge { background: #169fe0; color: #ffffff; }
+  .aws-section-body,
+  .aws-section-body p,
+  .aws-section-body li,
+  .aws-section-body td { color: #273a52; }
+  .concept-card {
+    background: #f8fbff;
+    border-color: #d7e2ef;
+  }
+  .concept-card .label { color: #087fc0; }
+  .concept-card p { color: #42566f; }
+  .compare-table { border: 1px solid #d7e2ef; }
+  .compare-table th { background: #299fe3; color: #ffffff; }
+  .compare-table td { border-bottom-color: #d7e2ef; background: #ffffff; }
+  .compare-table tr:nth-child(even) td { background: #f3f7fb; }
+  .code-block,
+  .arch-diagram { background: #111b2d; border-color: #31435d; color: #e7eef8; }
+  .code-block .comment { color: #9aabc1; }
+  .key-point { background: #eaf5ff; border-left-color: #168fd1; color: #173b5c; }
+  .key-point .kp-label { color: #087fc0; }
+  .warn-box { background: #fff8e7; border-left-color: #e5a11a; color: #6b4a00; }
+  .warn-box .w-label { color: #a86700; }
+  .quiz-box { background: #f1f7ff; border-color: #bfd7ed; color: #22364e; }
+  .quiz-box .q-label { color: #087fc0; }
+  .quiz-ans { background: #eaf8ef; color: #176536; border-color: #b9dfc5; }
+  .quiz-toggle { background: #167fbd; color: #ffffff; }
+  .quiz-toggle:hover { background: #0c669c; }
+  .progress-bar { background: #dce5f0; }
+  .checklist li { border-bottom-color: #dce5f0; }
+  .toc-content > .box {
+    background: #eef6ff !important;
+    border-color: #c8def1 !important;
+    color: #17233b !important;
+  }
+  @media (max-width: 768px) {
+    .aws-section-body { padding: 1rem; }
+  }
+
 </style>
 </head>
 <body>
