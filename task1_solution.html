@@ -52,6 +52,32 @@ details[open] summary{background:#e0f2fe;color:#075985}
 <div class="tip"><b>풀이 원칙:</b> 이름·태그·대소문자를 과제지와 정확히 일치시키고, 리소스를 만든 직후 채점 명령으로 검증합니다. 마지막에 한꺼번에 확인하면 수정 시간이 부족합니다.</div>
 </section>
 
+<section class="box" id="deploy-files">
+<h2>제1과제 배포 파일</h2>
+<p>과제에서 사용하는 Book App과 S3 정적 웹페이지 파일입니다. 버튼을 눌러 개별 다운로드한 뒤 과제 환경에 배포하세요.</p>
+<div class="grid">
+  <div class="card"><b>① Book App 실행 파일</b><p>Linux AMD64 백엔드 애플리케이션</p><a class="btn" href="book" download="book-linux-amd64">실행 파일 다운로드</a></div>
+  <div class="card"><b>② Frontend index.html</b><p>S3에 업로드할 정적 웹페이지</p><a class="btn" href="task1-deploy/index.html" download="index.html">HTML 다운로드</a></div>
+  <div class="card"><b>③ main.jpeg</b><p>index.html에서 사용하는 헤더 배경</p><a class="btn" href="main.jpeg" download="main.jpeg">이미지 다운로드</a></div>
+</div>
+<div class="resource-list" style="margin-top:16px">
+  <a class="btn" href="task1-deploy/index.html" target="_blank" rel="noopener">프론트 화면 미리보기</a>
+  <a class="btn" href="task1-deploy/README.txt" download="README.txt">배포 안내서 다운로드</a>
+</div>
+<h3>Book App 실행</h3>
+<pre>chmod +x book-linux-amd64
+export AWS_REGION=ap-northeast-2
+export TABLE_NAME=unicorn-concert-db
+./book-linux-amd64</pre>
+<h3>S3 정적 파일 업로드</h3>
+<pre>ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+BUCKET=unicorn-web-$ACCOUNT_ID
+
+aws s3 cp index.html s3://$BUCKET/index.html
+aws s3 cp main.jpeg s3://$BUCKET/main.jpeg</pre>
+<div class="warn">실행 파일은 Linux AMD64용입니다. Windows에서 직접 실행하는 파일이 아니며, ECR 이미지 빌드 또는 Linux 환경에서 사용해야 합니다.</div>
+</section>
+
 <section class="box">
 <h2>권장 구축 순서</h2>
 <div class="roadmap">
