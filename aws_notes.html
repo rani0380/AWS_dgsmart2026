@@ -14,6 +14,14 @@
 .note-card:hover{transform:translateY(-4px);box-shadow:0 13px 32px rgba(15,35,65,.16);border-color:#1aa7e8}.note-card img{display:block;width:100%;aspect-ratio:2/3;object-fit:cover;background:#eef3f8}.note-card span{display:flex;flex-direction:column;gap:.15rem;padding:.9rem 1rem;color:#0f1d34}.note-card span b{font-size:.75rem;color:#169ddd}
 .viewer{position:fixed;inset:0;z-index:9999;background:rgba(2,8,20,.94);display:none;align-items:center;justify-content:center;padding:1rem}.viewer.open{display:flex}.viewer img{max-width:min(92vw,900px);max-height:88vh;object-fit:contain;border-radius:8px;background:#fff}.viewer button{position:absolute;border:0;color:#fff;background:rgba(255,255,255,.14);cursor:pointer;border-radius:999px;width:48px;height:48px;font-size:1.6rem}.viewer .close{right:1.25rem;top:1.25rem}.viewer .prev{left:1.25rem}.viewer .next{right:1.25rem}.viewer .caption{position:absolute;bottom:.7rem;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.55);padding:.45rem .9rem;border-radius:999px;white-space:nowrap}
 @media(max-width:650px){.notes-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}.note-card span{font-size:.78rem;padding:.65rem}.viewer .prev{left:.25rem}.viewer .next{right:.25rem}.viewer button{width:40px;height:40px}.notes-intro{display:block}}
+
+.quiz-section{margin:4rem 0 1rem;padding:2rem;background:#fff;border:1px solid #dce4ef;border-radius:18px;box-shadow:0 10px 30px rgba(15,35,65,.09)}
+.quiz-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}.quiz-head p{color:#617087;margin:.35rem 0}.quiz-badge{white-space:nowrap;background:#e0f2fe;color:#0369a1;padding:.55rem .9rem;border-radius:999px;font-weight:800}
+.quiz-guide{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin:1.2rem 0}.quiz-guide div{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:1rem;text-align:center}.quiz-guide b{display:block;color:#0f172a;font-size:1.08rem}
+.quiz-start{text-align:center;padding:1rem 0}.quiz-exam{display:none}.quiz-exam.open{display:block}.quiz-toolbar{position:sticky;top:72px;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:1rem;background:#0f172a;color:#fff;border-radius:12px;padding:.9rem 1.1rem;margin:1rem 0}.quiz-timer{font-size:1.2rem;font-weight:900;color:#7dd3fc}.quiz-progress{font-size:.9rem;color:#cbd5e1}
+.quiz-question{border:1px solid #dbe4ef;border-left:5px solid #0ea5e9;border-radius:12px;padding:1.15rem;margin:1rem 0;background:#fbfdff}.quiz-question legend{padding:0 .35rem;font-weight:800;color:#0f172a;line-height:1.55}.quiz-option{display:block;margin:.55rem 0;padding:.65rem .75rem;border-radius:9px;background:#f1f5f9;cursor:pointer}.quiz-option:hover{background:#e0f2fe}.quiz-option input{margin-right:.55rem}
+.quiz-actions{display:flex;justify-content:center;gap:.75rem;flex-wrap:wrap;margin:1.5rem 0}.quiz-result{display:none;margin-top:1.5rem}.quiz-result.open{display:block}.score-panel{text-align:center;padding:1.6rem;border-radius:16px;background:linear-gradient(135deg,#e0f2fe,#ecfdf5);border:1px solid #bae6fd}.score-number{font-size:3rem;font-weight:900;color:#0369a1}.answer-review{margin-top:1rem;padding:1rem;border-radius:12px;border-left:5px solid}.answer-review.correct{background:#ecfdf5;border-color:#22c55e}.answer-review.wrong{background:#fff1f2;border-color:#f43f5e}.answer-review b{display:block;margin-bottom:.35rem}.answer-review p{margin:.25rem 0;color:#475569}
+@media(max-width:650px){.quiz-section{padding:1.1rem}.quiz-head{display:block}.quiz-badge{display:inline-block;margin-top:.5rem}.quiz-guide{grid-template-columns:1fr}.quiz-toolbar{top:64px}.quiz-question{padding:.9rem}}
 </style>
 </head>
 <body>
@@ -50,7 +58,18 @@
 <button class="note-card" data-index="15" aria-label="DevOps 아키텍처 크게 보기"><img src="assets/aws-notes/15.webp" alt="15쪽 DevOps 아키텍처" loading="lazy"><span><b>15쪽</b>DevOps 아키텍처</span></button>
 <button class="note-card" data-index="16" aria-label="AWS CLI 핵심 명령어 크게 보기"><img src="assets/aws-notes/16.webp" alt="16쪽 AWS CLI 핵심 명령어" loading="lazy"><span><b>16쪽</b>AWS CLI 핵심 명령어</span></button>
 <button class="note-card" data-index="17" aria-label="AWS 모범 사례 크게 보기"><img src="assets/aws-notes/17.webp" alt="17쪽 AWS 모범 사례" loading="lazy"><span><b>17쪽</b>AWS 모범 사례</span></button>
-<button class="note-card" data-index="18" aria-label="AWS 최종 치트시트 크게 보기"><img src="assets/aws-notes/18.webp" alt="18쪽 AWS 최종 치트시트" loading="lazy"><span><b>18쪽</b>AWS 최종 치트시트</span></button></div></main>
+<button class="note-card" data-index="18" aria-label="AWS 최종 치트시트 크게 보기"><img src="assets/aws-notes/18.webp" alt="18쪽 AWS 최종 치트시트" loading="lazy"><span><b>18쪽</b>AWS 최종 치트시트</span></button></div>
+<section class="quiz-section" id="aws-test">
+  <div class="quiz-head"><div><h2>AWS 핵심노트 모의 테스트</h2><p>노트 18장의 핵심 개념을 확인하는 학생용 객관식 시험입니다. 응시 결과는 서버에 저장되지 않습니다.</p></div><span class="quiz-badge">15문항 · 15분</span></div>
+  <div class="quiz-guide"><div><b>문항 수</b>객관식 15문항</div><div><b>시험 시간</b>15분</div><div><b>통과 기준</b>60점 이상</div></div>
+  <div class="quiz-start"><button class="btn" type="button" id="startQuiz">시험 시작하기</button></div>
+  <form class="quiz-exam" id="quizForm">
+    <div class="quiz-toolbar"><div><b>AWS 핵심 테스트</b><div class="quiz-progress" id="quizProgress">응답 0 / 15</div></div><div class="quiz-timer" id="quizTimer">15:00</div></div>
+    <div id="quizQuestions"></div>
+    <div class="quiz-actions"><button class="btn" type="submit">답안 제출 및 채점</button><button class="btn" type="button" id="resetQuiz" style="background:#64748b">처음부터 다시 풀기</button></div>
+  </form>
+  <div class="quiz-result" id="quizResult" aria-live="polite"></div>
+</section></main>
 <div class="viewer" role="dialog" aria-modal="true" aria-label="AWS 노트 확대 보기"><button class="close" aria-label="닫기">×</button><button class="prev" aria-label="이전 장">‹</button><img alt=""><button class="next" aria-label="다음 장">›</button><div class="caption"></div></div>
 <footer>2026 전국기능경기대회 클라우드컴퓨팅 AWS 학습 자료</footer>
 <script>
@@ -61,5 +80,31 @@ function closeViewer(){viewer.classList.remove('open');document.body.style.overf
 document.querySelectorAll('.note-card').forEach(b=>b.addEventListener('click',()=>show(Number(b.dataset.index))));
 viewer.querySelector('.close').onclick=closeViewer;viewer.querySelector('.prev').onclick=()=>show(current-1);viewer.querySelector('.next').onclick=()=>show(current+1);
 viewer.addEventListener('click',e=>{if(e.target===viewer)closeViewer()});document.addEventListener('keydown',e=>{if(!viewer.classList.contains('open'))return;if(e.key==='Escape')closeViewer();if(e.key==='ArrowLeft')show(current-1);if(e.key==='ArrowRight')show(current+1)});
+
+const quizData=[
+ {q:"AWS의 대표적인 요금 방식은 무엇인가?",o:["한 번 구매 후 영구 사용","사용한 만큼 지불","모든 서비스 무료","사용자 수만큼 고정 결제"],a:1,e:"AWS는 대부분의 서비스에서 실제 사용량을 기준으로 비용을 지불하는 종량제 방식을 사용합니다."},
+ {q:"AWS 리전(Region)에 대한 설명으로 가장 알맞은 것은?",o:["한 인스턴스 내부의 저장 공간","지리적으로 분리된 AWS 서비스 영역","사용자의 IAM 그룹","하나의 물리 서버"],a:1,e:"리전은 서울, 도쿄처럼 지리적으로 분리된 영역이며 내부에 여러 가용 영역이 있습니다."},
+ {q:"EC2가 다른 AWS 서비스에 접근할 때 권장되는 인증 방법은?",o:["소스 코드에 Access Key 저장","Root 계정 사용","IAM Role 연결","모든 권한 공개"],a:2,e:"EC2에는 IAM Role을 연결하여 장기 Access Key 없이 임시 자격 증명을 사용해야 합니다."},
+ {q:"Security Group의 특징은?",o:["상태 저장 방식의 가상 방화벽","S3 객체 버전 관리 기능","DNS 도메인 등록 서비스","데이터베이스 백업 서비스"],a:0,e:"Security Group은 인스턴스 수준에서 동작하는 상태 저장 방식의 가상 방화벽입니다."},
+ {q:"Amazon S3에 저장되는 데이터의 기본 단위는?",o:["행(Row)","블록(Block)","객체(Object)","패킷(Packet)"],a:2,e:"S3는 파일과 메타데이터를 객체 단위로 저장하는 객체 스토리지입니다."},
+ {q:"Public Subnet의 리소스가 인터넷과 통신할 때 연결하는 것은?",o:["Internet Gateway","IAM Policy","KMS Key","DynamoDB Stream"],a:0,e:"Public Subnet의 Route Table은 인터넷 방향 트래픽을 Internet Gateway로 전달합니다."},
+ {q:"Private Subnet의 인스턴스가 외부 업데이트를 받을 때 주로 사용하는 것은?",o:["CloudTrail","NAT Gateway","Route 53 Resolver만 사용","S3 Versioning"],a:1,e:"NAT Gateway는 Private Subnet의 인스턴스가 외부로 나가는 통신을 할 수 있게 합니다."},
+ {q:"HTTP 경로와 호스트 이름을 기준으로 트래픽을 분배할 수 있는 서비스는?",o:["Network ACL","Application Load Balancer","EBS","IAM"],a:1,e:"ALB는 OSI 7계층에서 URL 경로와 호스트 기반 라우팅을 지원합니다."},
+ {q:"도메인 이름을 IP 주소나 AWS 리소스에 연결하는 DNS 서비스는?",o:["Route 53","CloudWatch","ECR","KMS"],a:0,e:"Route 53은 AWS의 관리형 DNS 서비스로 다양한 라우팅 정책을 제공합니다."},
+ {q:"MySQL이나 PostgreSQL 같은 관계형 데이터베이스를 관리형으로 제공하는 서비스는?",o:["DynamoDB","Amazon RDS","SQS","CloudFront"],a:1,e:"Amazon RDS는 MySQL, PostgreSQL 등 관계형 DB 엔진의 운영을 관리해 줍니다."},
+ {q:"서버를 직접 관리하지 않고 이벤트에 따라 코드를 실행하는 서비스는?",o:["EC2","Lambda","EBS","VPC"],a:1,e:"AWS Lambda는 이벤트 기반으로 코드를 실행하고 실행 시간과 호출량에 따라 과금됩니다."},
+ {q:"Docker 컨테이너 이미지를 저장하는 AWS 서비스는?",o:["ECR","EFS","SNS","Route 53"],a:0,e:"Amazon ECR은 Docker 및 OCI 컨테이너 이미지를 저장·관리하는 레지스트리입니다."},
+ {q:"AWS 리소스의 지표, 로그, 경보를 통합 관리하는 서비스는?",o:["CloudWatch","CloudFront","CodeCommit","IAM"],a:0,e:"CloudWatch는 Metrics, Logs, Alarm, Dashboard를 제공하는 대표 모니터링 서비스입니다."},
+ {q:"AWS에서 암호화 키를 생성하고 관리하는 서비스는?",o:["KMS","WAF","S3 Glacier","CodeBuild"],a:0,e:"AWS KMS는 데이터 암호화에 사용하는 키를 생성·통제·감사하는 서비스입니다."},
+ {q:"일반적인 CI/CD 흐름으로 가장 알맞은 것은?",o:["모니터링 → 삭제 → 빌드 → 소스","소스 → 빌드·테스트 → 배포 → 모니터링","배포 → 소스 → 테스트 → 종료","DB 삭제 → 배포 → 빌드 → 알림"],a:1,e:"CI/CD는 소스 변경을 시작으로 빌드·테스트, 배포, 모니터링과 피드백 순서로 이어집니다."}
+];
+const quizForm=document.getElementById('quizForm'),questionBox=document.getElementById('quizQuestions'),resultBox=document.getElementById('quizResult'),timerBox=document.getElementById('quizTimer'),progressBox=document.getElementById('quizProgress');
+let quizSeconds=900,quizTick=null,quizFinished=false;
+function renderQuiz(){questionBox.innerHTML=quizData.map((item,i)=>'<fieldset class="quiz-question"><legend>'+(i+1)+'. '+item.q+'</legend>'+item.o.map((opt,j)=>'<label class="quiz-option"><input type="radio" name="q'+i+'" value="'+j+'"> '+opt+'</label>').join('')+'</fieldset>').join('')}
+function updateQuizProgress(){const answered=quizData.filter((_,i)=>quizForm.querySelector('input[name="q'+i+'"]:checked')).length;progressBox.textContent='응답 '+answered+' / '+quizData.length}
+function startQuiz(){quizFinished=false;quizSeconds=900;renderQuiz();quizForm.reset();resultBox.classList.remove('open');resultBox.innerHTML='';quizForm.classList.add('open');document.querySelector('.quiz-start').style.display='none';updateQuizProgress();timerBox.textContent='15:00';clearInterval(quizTick);quizTick=setInterval(()=>{quizSeconds--;const m=String(Math.floor(quizSeconds/60)).padStart(2,'0'),s=String(quizSeconds%60).padStart(2,'0');timerBox.textContent=m+':'+s;if(quizSeconds<=0){clearInterval(quizTick);gradeQuiz(true)}},1000);document.getElementById('aws-test').scrollIntoView({behavior:'smooth'})}
+function gradeQuiz(auto=false){if(quizFinished)return;const answers=quizData.map((_,i)=>quizForm.querySelector('input[name="q'+i+'"]:checked'));const missing=answers.filter(x=>!x).length;if(missing&&!auto&&!confirm('아직 '+missing+'문항에 답하지 않았습니다. 그대로 제출할까요?'))return;quizFinished=true;clearInterval(quizTick);let correct=0;let review='';quizData.forEach((item,i)=>{const selected=answers[i]?Number(answers[i].value):-1;const ok=selected===item.a;if(ok)correct++;review+='<div class="answer-review '+(ok?'correct':'wrong')+'"><b>'+(i+1)+'번 '+(ok?'정답':'오답')+'</b><p>정답: '+item.o[item.a]+'</p><p>'+item.e+'</p></div>'});const score=Math.round(correct/quizData.length*100);const label=score>=90?'매우 우수':score>=80?'우수':score>=60?'통과':'복습 필요';resultBox.innerHTML='<div class="score-panel"><div class="score-number">'+score+'점</div><b>'+correct+' / '+quizData.length+'문항 정답 · '+label+'</b><p>'+(auto?'시험 시간이 종료되어 자동 채점되었습니다.':'채점이 완료되었습니다.')+'</p></div>'+review;resultBox.classList.add('open');resultBox.scrollIntoView({behavior:'smooth',block:'start'})}
+document.getElementById('startQuiz').addEventListener('click',startQuiz);document.getElementById('resetQuiz').addEventListener('click',startQuiz);quizForm.addEventListener('change',updateQuizProgress);quizForm.addEventListener('submit',e=>{e.preventDefault();gradeQuiz(false)});
+
 </script>
 </body></html>
