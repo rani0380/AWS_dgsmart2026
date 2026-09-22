@@ -244,6 +244,17 @@ aws dynamodb get-item --table-name destination-db \
   <div class="score-live"><span>현재 총점</span><strong id="score-total">0.0</strong><span>/ 30점</span></div>
 </div>
 <div class="tip"><b>개인정보·보안 주의:</b> AWS Access Key, Secret Access Key, Session Token, 비밀번호는 절대 제출하지 마세요. 채점 명령의 출력 결과만 붙여넣으세요.</div>
+<div class="card" style="margin:16px 0;border-left:5px solid #0ea5e9">
+  <b>채점 스크립트 다운로드 및 실행</b>
+  <p class="mini">AWS CloudShell에서 실행하세요. 리소스를 변경하지 않고 조회 명령만 수행하며, 영역별 점수와 30점 만점 총점을 출력합니다.</p>
+  <div class="resource-list">
+    <a class="btn" href="task1-materials/task1-mark.sh" download="task1-mark.sh">task1-mark.sh 다운로드</a>
+  </div>
+  <pre>curl -fL "http://dgsmart-cloudcom.kro.kr/task1-materials/task1-mark.sh" -o ~/task1-mark.sh
+chmod +x ~/task1-mark.sh
+bash ~/task1-mark.sh</pre>
+  <p class="mini">실행이 끝나면 처음부터 <b>RESULT_END</b>까지 전체 내용을 복사해 아래 입력란에 붙여넣으세요.</p>
+</div>
 <form id="score-form" method="post" target="score-submit-frame" action="https://script.google.com/macros/s/AKfycbxWCYdfnV5a8nVyLDI8B2sEMOGHLcKb61bNX_tgQ2rETZJjd82igTsSpbqzB94EQ9zQMA/exec" novalidate>
   <input type="hidden" name="taskKey" value="dgsmart-task1-2026">
   <input type="hidden" name="taskName" value="AWS_dgsmart2026_제1과제">
