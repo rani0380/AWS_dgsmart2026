@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AWS 한글 핵심노트 | AWS 실전 학습 사이트</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.notes-hero{padding:4.5rem 1.25rem 3.2rem;background:linear-gradient(135deg,#071329,#102b51 60%,#0d4968);color:#fff}
+.notes-hero .wrap{max-width:1060px;margin:auto}.notes-hero h1{font-size:clamp(2rem,5vw,3.5rem);margin:.35rem 0}.notes-hero p{max-width:720px;color:#d5e7fa;line-height:1.7}
+.notes-main{max-width:1180px;margin:2rem auto;padding:0 1.2rem}.notes-intro{display:flex;justify-content:space-between;gap:1rem;align-items:center;margin-bottom:1.4rem}.notes-intro p{color:#617087}
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:1.25rem}
+.note-card{display:block;width:100%;padding:0;border:1px solid #dce4ef;border-radius:14px;overflow:hidden;background:#fff;text-align:left;cursor:pointer;box-shadow:0 7px 22px rgba(15,35,65,.08);transition:.2s}
+.note-card:hover{transform:translateY(-4px);box-shadow:0 13px 32px rgba(15,35,65,.16);border-color:#1aa7e8}.note-card img{display:block;width:100%;aspect-ratio:2/3;object-fit:cover;background:#eef3f8}.note-card span{display:flex;flex-direction:column;gap:.15rem;padding:.9rem 1rem;color:#0f1d34}.note-card span b{font-size:.75rem;color:#169ddd}
+.viewer{position:fixed;inset:0;z-index:9999;background:rgba(2,8,20,.94);display:none;align-items:center;justify-content:center;padding:1rem}.viewer.open{display:flex}.viewer img{max-width:min(92vw,900px);max-height:88vh;object-fit:contain;border-radius:8px;background:#fff}.viewer button{position:absolute;border:0;color:#fff;background:rgba(255,255,255,.14);cursor:pointer;border-radius:999px;width:48px;height:48px;font-size:1.6rem}.viewer .close{right:1.25rem;top:1.25rem}.viewer .prev{left:1.25rem}.viewer .next{right:1.25rem}.viewer .caption{position:absolute;bottom:.7rem;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.55);padding:.45rem .9rem;border-radius:999px;white-space:nowrap}
+@media(max-width:650px){.notes-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}.note-card span{font-size:.78rem;padding:.65rem}.viewer .prev{left:.25rem}.viewer .next{right:.25rem}.viewer button{width:40px;height:40px}.notes-intro{display:block}}
+</style>
+</head>
+<body>
+<header class="notes-hero"><div class="wrap"><p class="eyebrow">AWS VISUAL STUDY NOTES · KOREAN</p><h1>AWS 한글 핵심노트</h1><p>AWS의 핵심 서비스를 손글씨형 그림 노트 19장으로 정리했습니다. 카드를 누르면 크게 보고, 방향키로 다음 장을 넘길 수 있습니다.</p><div class="hero-actions"><a class="btn" href="#gallery">노트 보기</a><a class="btn secondary" href="index.html">← 메인으로</a></div></div></header>
+<nav aria-label="주요 학습 목차"><a href="index.html">홈</a><a href="chapter_aws_basic.html">AWS 기초</a><a class="active" href="aws_notes.html">AWS 한글노트</a><a href="chapter_1_linux.html">1. Linux</a><a href="chapter_2_network.html">2. Network</a><a href="chapter_3_database.html">3. Database</a><a href="chapter_4_docker_ecs.html">4. Docker/ECS</a><a href="chapter_5_eks.html">5. EKS</a><a href="chapter_6_terraform.html">6. Terraform</a><a href="chapter_7_monitoring.html">7. Monitoring</a><a href="chapter_8_serverless.html">8. Serverless</a></nav>
+<main class="notes-main" id="gallery"><div class="notes-intro"><div><h2>전체 노트</h2><p>표지 1장과 학습 노트 18장 · 이미지를 클릭하면 확대됩니다.</p></div><span>총 19장</span></div><div class="notes-grid"><button class="note-card" data-index="0" aria-label="표지 크게 보기"><img src="assets/aws-notes/00.webp" alt="AWS 한글 핵심노트 표지" loading="lazy"><span><b>표지</b>표지</span></button>
+<button class="note-card" data-index="1" aria-label="AWS 개요 크게 보기"><img src="assets/aws-notes/01.webp" alt="1쪽 AWS 개요" loading="lazy"><span><b>1쪽</b>AWS 개요</span></button>
+<button class="note-card" data-index="2" aria-label="AWS 글로벌 인프라 크게 보기"><img src="assets/aws-notes/02.webp" alt="2쪽 AWS 글로벌 인프라" loading="lazy"><span><b>2쪽</b>AWS 글로벌 인프라</span></button>
+<button class="note-card" data-index="3" aria-label="IAM 자격 증명 및 접근 관리 크게 보기"><img src="assets/aws-notes/03.webp" alt="3쪽 IAM 자격 증명 및 접근 관리" loading="lazy"><span><b>3쪽</b>IAM 자격 증명 및 접근 관리</span></button>
+<button class="note-card" data-index="4" aria-label="EC2 가상 서버 크게 보기"><img src="assets/aws-notes/04.webp" alt="4쪽 EC2 가상 서버" loading="lazy"><span><b>4쪽</b>EC2 가상 서버</span></button>
+<button class="note-card" data-index="5" aria-label="스토리지 서비스 크게 보기"><img src="assets/aws-notes/05.webp" alt="5쪽 스토리지 서비스" loading="lazy"><span><b>5쪽</b>스토리지 서비스</span></button>
+<button class="note-card" data-index="6" aria-label="네트워킹 기초 크게 보기"><img src="assets/aws-notes/06.webp" alt="6쪽 네트워킹 기초" loading="lazy"><span><b>6쪽</b>네트워킹 기초</span></button>
+<button class="note-card" data-index="7" aria-label="로드 밸런서와 Auto Scaling 크게 보기"><img src="assets/aws-notes/07.webp" alt="7쪽 로드 밸런서와 Auto Scaling" loading="lazy"><span><b>7쪽</b>로드 밸런서와 Auto Scaling</span></button>
+<button class="note-card" data-index="8" aria-label="Route 53과 DNS 크게 보기"><img src="assets/aws-notes/08.webp" alt="8쪽 Route 53과 DNS" loading="lazy"><span><b>8쪽</b>Route 53과 DNS</span></button>
+<button class="note-card" data-index="9" aria-label="데이터베이스 크게 보기"><img src="assets/aws-notes/09.webp" alt="9쪽 데이터베이스" loading="lazy"><span><b>9쪽</b>데이터베이스</span></button>
+<button class="note-card" data-index="10" aria-label="서버리스 컴퓨팅 크게 보기"><img src="assets/aws-notes/10.webp" alt="10쪽 서버리스 컴퓨팅" loading="lazy"><span><b>10쪽</b>서버리스 컴퓨팅</span></button>
+<button class="note-card" data-index="11" aria-label="AWS의 컨테이너 크게 보기"><img src="assets/aws-notes/11.webp" alt="11쪽 AWS의 컨테이너" loading="lazy"><span><b>11쪽</b>AWS의 컨테이너</span></button>
+<button class="note-card" data-index="12" aria-label="AWS CI/CD 크게 보기"><img src="assets/aws-notes/12.webp" alt="12쪽 AWS CI/CD" loading="lazy"><span><b>12쪽</b>AWS CI/CD</span></button>
+<button class="note-card" data-index="13" aria-label="모니터링과 로깅 크게 보기"><img src="assets/aws-notes/13.webp" alt="13쪽 모니터링과 로깅" loading="lazy"><span><b>13쪽</b>모니터링과 로깅</span></button>
+<button class="note-card" data-index="14" aria-label="보안 서비스 크게 보기"><img src="assets/aws-notes/14.webp" alt="14쪽 보안 서비스" loading="lazy"><span><b>14쪽</b>보안 서비스</span></button>
+<button class="note-card" data-index="15" aria-label="DevOps 아키텍처 크게 보기"><img src="assets/aws-notes/15.webp" alt="15쪽 DevOps 아키텍처" loading="lazy"><span><b>15쪽</b>DevOps 아키텍처</span></button>
+<button class="note-card" data-index="16" aria-label="AWS CLI 핵심 명령어 크게 보기"><img src="assets/aws-notes/16.webp" alt="16쪽 AWS CLI 핵심 명령어" loading="lazy"><span><b>16쪽</b>AWS CLI 핵심 명령어</span></button>
+<button class="note-card" data-index="17" aria-label="AWS 모범 사례 크게 보기"><img src="assets/aws-notes/17.webp" alt="17쪽 AWS 모범 사례" loading="lazy"><span><b>17쪽</b>AWS 모범 사례</span></button>
+<button class="note-card" data-index="18" aria-label="AWS 최종 치트시트 크게 보기"><img src="assets/aws-notes/18.webp" alt="18쪽 AWS 최종 치트시트" loading="lazy"><span><b>18쪽</b>AWS 최종 치트시트</span></button></div></main>
+<div class="viewer" role="dialog" aria-modal="true" aria-label="AWS 노트 확대 보기"><button class="close" aria-label="닫기">×</button><button class="prev" aria-label="이전 장">‹</button><img alt=""><button class="next" aria-label="다음 장">›</button><div class="caption"></div></div>
+<footer>2026 전국기능경기대회 클라우드컴퓨팅 AWS 학습 자료</footer>
+<script>
+const titles=["표지","AWS 개요","AWS 글로벌 인프라","IAM 자격 증명 및 접근 관리","EC2 가상 서버","스토리지 서비스","네트워킹 기초","로드 밸런서와 Auto Scaling","Route 53과 DNS","데이터베이스","서버리스 컴퓨팅","AWS의 컨테이너","AWS CI/CD","모니터링과 로깅","보안 서비스","DevOps 아키텍처","AWS CLI 핵심 명령어","AWS 모범 사례","AWS 최종 치트시트"];
+const viewer=document.querySelector('.viewer'),large=viewer.querySelector('img'),caption=viewer.querySelector('.caption');let current=0;
+function show(i){current=(i+19)%19;large.src='assets/aws-notes/'+String(current).padStart(2,'0')+'.webp';large.alt=titles[current];caption.textContent=(current===0?'표지':current+' / 18')+' · '+titles[current];viewer.classList.add('open');document.body.style.overflow='hidden'}
+function closeViewer(){viewer.classList.remove('open');document.body.style.overflow=''}
+document.querySelectorAll('.note-card').forEach(b=>b.addEventListener('click',()=>show(Number(b.dataset.index))));
+viewer.querySelector('.close').onclick=closeViewer;viewer.querySelector('.prev').onclick=()=>show(current-1);viewer.querySelector('.next').onclick=()=>show(current+1);
+viewer.addEventListener('click',e=>{if(e.target===viewer)closeViewer()});document.addEventListener('keydown',e=>{if(!viewer.classList.contains('open'))return;if(e.key==='Escape')closeViewer();if(e.key==='ArrowLeft')show(current-1);if(e.key==='ArrowRight')show(current+1)});
+</script>
+</body></html>
